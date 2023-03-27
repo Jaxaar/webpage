@@ -2,29 +2,23 @@
 <html>
 	<head>
 		<title>
-			"Cookie Clicker"
+			"To avoid thinking"
 		</title>
 	</head>
 
-	<script  src="Game/main.js"></script>
+	<script  src="src/main.js"></script>
 
 	<body>
 
-		<h1>Definitely Cookie Clicker</h1>
-		<h2 id="cookies"></h2>
+		<h1>"Helpful Things"</h1>
 
 		<button type="button" 
-			onclick = "game.bigCookieClick()" >
-			"Big Cookie"
+			onclick = "main.generatePairings()" >
+			GeneratePairs
 		</button>
 
-        <p id="cursorData"> Cursors: </p>
-
-        <button type="button" 
-        onclick = "game.buyCursor()" >
-        "Buy Cursor"
-        </button>
-
+        <p id="pairData"> Pairings: </p>
+        <p id="pairs"> </p>
 
 	</body>
 </html>
