@@ -3,11 +3,11 @@
 
 //Initialization
 var main = {};
-var options = ["a", "b", "c", "d", "e", "r", "d2?"]
+var options = ["a", "b", "c", "d", "e", "r"]
 
 
 main.generatePairings = function() {
-    options = ["a", "b", "c", "d", "e", "r", "d2"]
+    options = ["a", "b", "c", "d", "e", "r"]
     var str = "<br>"
     while(options.length > 3){
         x = Math.floor(Math.random() * options.length)
