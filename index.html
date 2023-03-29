@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>
-			"To avoid thinking"
+			To avoid thinking
 		</title>
 	</head>
 
@@ -12,11 +12,19 @@
 
 		<h1>"Helpful Things"</h1>
 
-		<button type="button" 
-			onclick = "main.generatePairings()" >
-			GeneratePairs
-		</button>
+		<input type="checkbox" id="aBox" onclick="main.togglePerson('A')"> A
+		<input type="checkbox" id="bBox" onclick="main.togglePerson('B')"> B
+		<input type="checkbox" id="cBox" onclick="main.togglePerson('C')"> C
+		<input type="checkbox" id="dBox" onclick="main.togglePerson('D')"> D
+		<input type="checkbox" id="eBox" onclick="main.togglePerson('E')"> E
+		<input type="checkbox" id="rBox" onclick="main.togglePerson('R')"> R
 
+		<p>
+			<button type="button" 
+				onclick = "main.generatePairings()" >
+				GeneratePairs
+			</button>
+		</p>
         <p id="pairData"> Pairings: </p>
         <p id="pairs"> </p>
 

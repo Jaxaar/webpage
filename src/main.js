@@ -3,11 +3,27 @@
 
 //Initialization
 var main = {};
-var options = ["a", "b", "c", "d", "e", "r"]
+// var options = ["a", "b", "c", "d", "e", "r"]
+var people = []
+
+main.getPeople = function() {
+    return JSON.parse(JSON.stringify(people))
+    // return structuredClone(array1);
+}
+
+main.togglePerson = function(str) {
+    if(people.includes(str)){
+        people.splice(people.indexOf(str),1)
+    }
+    else{
+        people.push(str)
+    }
+    console.log(people)
+}
 
 
 main.generatePairings = function() {
-    options = ["a", "b", "c", "d", "e", "r"]
+    options = main.getPeople()
     var str = "<br>"
     while(options.length > 3){
         x = Math.floor(Math.random() * options.length)
