@@ -3,7 +3,7 @@
 
 //Initialization
 var main = {};
-// var options = ["a", "b", "c", "d", "e", "r"]
+// var o = ["a", "b", "c", "d", "e", "r"]
 var people = []
 
 main.getPeople = function() {
