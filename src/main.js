@@ -1,4 +1,20 @@
-
+document.addEventListener("DOMContentLoaded", () => {
+    const checkboxes = document.getElementsByTagName("input");
+    for(const element of checkboxes) {
+        element.setAttribute('autocomplete', "off");
+        element.classList.add('btn-check');
+    }
+    const checkboxLabels = document.getElementsByTagName("label");
+    for(const element of checkboxLabels) {
+        element.classList.add('btn', 'btn-outline-primary');
+    }
+    const pairLDemo = document.getElementById('pair-l');
+    const pairRDemo = document.getElementById('pair-r');
+    pairLDemo.addEventListener('mouseover', onFencerHovered);
+    pairLDemo.addEventListener('mouseleave', onFencerUnhovered);
+    pairRDemo.addEventListener('mouseover', onFencerHovered);
+    pairRDemo.addEventListener('mouseleave', onFencerUnhovered);
+});
 
 
 //Initialization
@@ -21,7 +37,12 @@ main.togglePerson = function(str) {
     console.log(people)
 }
 
-
+{/* Make this structure for each pair:
+<div class="pair-group">
+    <div class="pair left">E</div>
+    <div class="pair right">C</div>
+</div> 
+*/}
 main.generatePairings = function() {
     options = main.getPeople()
     var str = "<br>"
@@ -44,4 +65,31 @@ main.generatePairings = function() {
 
     document.getElementById('pairData').innerHTML = "Pairings: " + str
 
+}
+
+function onFencerHovered(event) {
+    const node = event.target;
+    const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
+    opponentNode.classList.add('hide');
+}
+
+function onFencerUnhovered(event) {
+    const node = event.target;
+    const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
+    opponentNode.classList.remove('hide');
+}
+
+function makePairHTML() {
+    const pairGroup = document.createElement("div");
+    pairGroup.classList.add('pair-group');
+    const left = document.createElement("div");
+    left.classList.add('pair left');
+    left.addEventListener('mouseover', onFencerHovered);
+    left.addEventListener('mouseleave', onFencerUnhovered);
+    const right = document.createElement("div");
+    right.classList.add('pair right');
+    right.addEventListener('mouseover', onFencerHovered);
+    right.addEventListener('mouseleave', onFencerUnhovered);
+    pairGroup.append(left, right);
+    return pairGroup;
 }
