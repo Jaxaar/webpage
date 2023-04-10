@@ -14,8 +14,12 @@
   transition: width 0.40s 0s ease-in-out;
 }
 
-.pair:hover {
+.pair.full {
   width: 100%;
+}
+
+.pair:hover {
+  cursor: pointer;
 }
 
 .pair.hide {

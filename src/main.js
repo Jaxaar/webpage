@@ -75,16 +75,23 @@ function groupFencers(options, chunkSize) {
 	return groups;
 }
 
-function onFencerHovered(event) {
-	const node = event.target;
-	const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
-	opponentNode.classList.add('hide');
+function toggleClass(node, cl) {
+	const oppCl = cl === 'full' ? 'hide' : 'full';
+	if (node.classList.contains(cl)) {
+		node.classList.remove(cl);
+	} else {
+		node.classList.add(cl);
+	};
+	if (node.classList.contains(oppCl)) {
+		node.classList.remove(oppCl);
+	}
 }
 
-function onFencerUnhovered(event) {
+function onFencerClicked(event) {
 	const node = event.target;
 	const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
-	opponentNode.classList.remove('hide');
+	toggleClass(node, 'full');
+	toggleClass(opponentNode, 'hide');
 }
 
 function makePairHTML(leftFencer, rightFencer) {
@@ -92,13 +99,11 @@ function makePairHTML(leftFencer, rightFencer) {
 	pairGroup.classList.add('pair-group');
 	const left = document.createElement("div");
 	left.classList.add('pair', 'left');
-	left.addEventListener('mouseover', onFencerHovered);
-	left.addEventListener('mouseleave', onFencerUnhovered);
+	left.addEventListener('click', onFencerClicked);
 	left.innerText = leftFencer;
 	const right = document.createElement("div");
 	right.classList.add('pair', 'right');
-	right.addEventListener('mouseover', onFencerHovered);
-	right.addEventListener('mouseleave', onFencerUnhovered);
+	right.addEventListener('click', onFencerClicked);
 	right.innerText = rightFencer;
 	pairGroup.append(left, right);
 	return pairGroup;
