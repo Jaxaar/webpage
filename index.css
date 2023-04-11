@@ -1,0 +1,36 @@
+.pair-group {
+  min-height: 75px;
+  max-height: 150px;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.pair {
+  text-align: center;
+  line-height: 5rem;
+  font-size: large;
+  width: 50%;
+  transition: width 0.40s 0s ease-in-out;
+}
+
+.pair.full {
+  width: 100%;
+}
+
+.pair:hover {
+  cursor: pointer;
+}
+
+.pair.hide {
+  width: 0%;
+  transition: width 0.5s 0 ease-in-out;
+}
+
+.pair.left {
+  background-color:red;
+}
+
+.pair.right {
+  background-color:rgb(37, 214, 37);
+}
