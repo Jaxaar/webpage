@@ -2,33 +2,22 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 
+
 <template>
     <div>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+		
         <div class="container mx-auto">
 
             <div>"Helpful Things"</div>
-            <div class="btn-group" role="group">
-                <input type="checkbox" id="aBox" onclick="main.togglePerson('A')">
-                <label for="aBox">A</label>
-
-                <input type="checkbox" id="bBox" onclick="main.togglePerson('B')">
-                <label for="bBox">B</label>
-
-                <input type="checkbox" id="cBox" onclick="main.togglePerson('C')">
-                <label for="cBox">C</label>
-
-                <input type="checkbox" id="dBox" onclick="main.togglePerson('D')">
-                <label for="dBox">D</label>
-
-                <input type="checkbox" id="eBox" onclick="main.togglePerson('E')">
-                <label for="eBox">E</label>
-
-                <input type="checkbox" id="rBox" onclick="main.togglePerson('R')">
-                <label for="rBox">R</label>
+            <div class="btn-group" role="group" v-for="item of ['A', 'B', 'C', 'D', 'E', 'R']">
+                <input type="checkbox" :id="item + 'box'" @click="togglePerson(item)">
+                <label :for="item + 'box'">{{ item }}</label>
             </div>
 
             <div>
-                <button type="button" class="btn btn-primary" onclick="main.generatePairings()">
+                <button type="button" class="btn btn-primary" @click="generatePairings()">
                     GeneratePairs
                 </button>
             </div>
@@ -36,8 +25,18 @@ import { RouterLink, RouterView } from 'vue-router'
                 <div class="pair-header">
                     Pairings:
                 </div>
-                <div class="pairs" id="pairs"></div>
-                <div class="crowd" id="crowd"></div>
+                <div class="pairs" id="pairs">
+					<div v-for="item of pairs" class = "pair-group">
+						<div @click="onFencerClicked"> {{ item[0] }}</div>
+						<div @click="onFencerClicked"> {{ item[1] }} </div>
+					</div>
+				</div>
+                <div class="crowd" id="crowd">
+					<div class = "spectator"
+						v-for="item of crowd"
+						> {{ item }}
+					</div>
+				</div>
             </div>
         </div>
     </div>
@@ -45,117 +44,74 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <script>
 
+export default {
+    name: 'FencingMain',
+	components: {
+		
+	},
+    data () {
+      	return {
+			people: [],
+			pairs: [],
+			crowd: [],
+	  	}
+    },
+	methods: {
+		togglePerson(str){
+			if (this.people.includes(str)) {
+				this.people.splice(this.people.indexOf(str), 1)
+			}
+			else {
+				this.people.push(str)
+			}
+			console.log(this.people)
+		},
+		getPeople(){
+			return JSON.parse(JSON.stringify(this.people))
+		},
+		generatePairings(){
+			let options = this.getPeople();
+			options = this.shuffleArray(options);
 
-
-//Initialization
-var main = {};
-// var o = ["a", "b", "c", "d", "e", "r"]
-var people = []
-
-main.getPeople = function () {
-	return JSON.parse(JSON.stringify(people))
-	// return structuredClone(array1);
-}
-
-main.togglePerson = function (str) {
-	if (people.includes(str)) {
-		people.splice(people.indexOf(str), 1)
-	}
-	else {
-		people.push(str)
-	}
-	console.log(people)
-}
-
-{/* Make this structure for each pair:
-<div class="pair-group">
-    <div class="pair left">Fencer 1</div>
-    <div class="pair right">Fencer 2</div>
-</div>
-*/}
-main.generatePairings = function () {
-	options = main.getPeople();
-	shuffleArray(options);
-	const pairsDiv = document.getElementById('pairs');
-	const crowdDiv = document.getElementById('crowd');
-
-	const groupedFencers = groupFencers(options, 2);
-	const fencersHTML = [];
-	var crowd = [];
-
-	for (const fencers of groupedFencers) {
-		if (fencers.length == 2) {
-			fencersHTML.push(makePairHTML(fencers[0], fencers[1]));
-		} else {
-			crowd = remainderHTML(fencers);
+			const groupSize = 2
+			this.pairs = this.groupFencers(options, groupSize);
+			this.crowd = options
+		},
+		// from user ashleedawg at https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+		shuffleArray(array){
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+			return array
+		},
+		groupFencers(options, chunkSize) {
+			const groups = [];
+			while (options.length >= chunkSize) {
+				const chunk = options.splice(0, chunkSize);
+				groups.push(chunk);
+			}
+			return groups;
+		},
+		toggleClass(node, cl) {
+			const oppCl = cl === 'full' ? 'hide' : 'full';
+			if (node.classList.contains(cl)) {
+				node.classList.remove(cl);
+			} else {
+				node.classList.add(cl);
+			};
+			if (node.classList.contains(oppCl)) {
+				node.classList.remove(oppCl);
+			}
+		},
+		onFencerClicked(event) {
+			const node = event.target;
+			const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
+			this.toggleClass(node, 'full');
+			this.toggleClass(opponentNode, 'hide');
 		}
-	}
-	pairsDiv.replaceChildren(...fencersHTML);
-	crowdDiv.replaceChildren(...crowd);
+	},
 }
-
-// from user ashleedawg at https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
-function shuffleArray(array) {
-	for (let i = array.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[array[i], array[j]] = [array[j], array[i]];
-	}
-}
-
-function groupFencers(options, chunkSize) {
-	const groups = [];
-	for (let i = 0; i < options.length; i += chunkSize) {
-		const chunk = options.slice(i, i + chunkSize);
-		groups.push(chunk);
-	}
-	return groups;
-}
-
-function toggleClass(node, cl) {
-	const oppCl = cl === 'full' ? 'hide' : 'full';
-	if (node.classList.contains(cl)) {
-		node.classList.remove(cl);
-	} else {
-		node.classList.add(cl);
-	};
-	if (node.classList.contains(oppCl)) {
-		node.classList.remove(oppCl);
-	}
-}
-
-function onFencerClicked(event) {
-	const node = event.target;
-	const opponentNode = !!node.nextElementSibling ? node.nextElementSibling : node.previousElementSibling;
-	toggleClass(node, 'full');
-	toggleClass(opponentNode, 'hide');
-}
-
-function makePairHTML(leftFencer, rightFencer) {
-	const pairGroup = document.createElement("div");
-	pairGroup.classList.add('pair-group');
-	const left = document.createElement("div");
-	left.classList.add('pair', 'left');
-	left.addEventListener('click', onFencerClicked);
-	left.innerText = leftFencer;
-	const right = document.createElement("div");
-	right.classList.add('pair', 'right');
-	right.addEventListener('click', onFencerClicked);
-	right.innerText = rightFencer;
-	pairGroup.append(left, right);
-	return pairGroup;
-}
-
-function remainderHTML(remainder) {
-	const crowdElems = [];
-	for (const fencer of remainder) {
-		const spectator = document.createElement("div");
-		spectator.classList.add('spectator');
-		spectator.innerText = remainder;
-		crowdElems.push(spectator);
-	}
-	return crowdElems;
-}
-
 
 </script>
 
