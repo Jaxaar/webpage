@@ -7,14 +7,21 @@ import { RouterLink, RouterView } from 'vue-router'
     <div>
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
 		integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-		
-        <div class="container mx-auto">
-
-            <div>"Helpful Things"</div>
+        <div style = "margin-left: 5%; margin-top: 2%;">
+            <div style = "font-weight: bold">"Helpful Things"</div>
             <div class="btn-group" role="group" v-for="item of ['A', 'B', 'C', 'D', 'E', 'R']">
                 <input type="checkbox" :id="item + 'box'" @click="togglePerson(item)">
                 <label :for="item + 'box'">{{ item }}</label>
             </div>
+
+			<div>
+				<input type="text" placeholder="Enter items, comma seperated" v-model="entryString">
+			</div>
+
+			<div>
+				<input type="text" placeholder="Group Size" v-model="gSize">
+			</div>
+
 
             <div>
                 <button type="button" class="btn btn-primary" @click="generatePairings()">
@@ -27,8 +34,7 @@ import { RouterLink, RouterView } from 'vue-router'
                 </div>
                 <div class="pairs" id="pairs">
 					<div v-for="item of pairs" class = "pair-group">
-						<div @click="onFencerClicked"> {{ item[0] }}</div>
-						<div @click="onFencerClicked"> {{ item[1] }} </div>
+						<div @click="onFencerClicked" v-for="k of item"> {{ k }}</div>
 					</div>
 				</div>
                 <div class="crowd" id="crowd">
@@ -52,8 +58,11 @@ export default {
     data () {
       	return {
 			people: [],
+			textPeople: [],
 			pairs: [],
 			crowd: [],
+			entryString: "",
+			gSize: 2,
 	  	}
     },
 	methods: {
@@ -67,13 +76,19 @@ export default {
 			console.log(this.people)
 		},
 		getPeople(){
-			return JSON.parse(JSON.stringify(this.people))
+			if(this.textPeople != ""){
+				return JSON.parse(JSON.stringify(this.people)).concat(this.textPeople)
+			}
+			else{
+				return JSON.parse(JSON.stringify(this.people))
+			}
 		},
 		generatePairings(){
 			let options = this.getPeople();
 			options = this.shuffleArray(options);
+			console.log(options)
 
-			const groupSize = 2
+			const groupSize = this.gSize
 			this.pairs = this.groupFencers(options, groupSize);
 			this.crowd = options
 		},
@@ -88,6 +103,7 @@ export default {
 		groupFencers(options, chunkSize) {
 			const groups = [];
 			while (options.length >= chunkSize) {
+				console.log(groups)
 				const chunk = options.splice(0, chunkSize);
 				groups.push(chunk);
 			}
@@ -111,11 +127,22 @@ export default {
 			this.toggleClass(opponentNode, 'hide');
 		}
 	},
+	watch: {
+		entryString(){
+			this.textPeople = this.entryString.split(",")
+		},
+	}
 }
 
 </script>
 
 <style scoped>
+
+.btn-group{
+	margin: 0.25rem;
+}
+
+
 .pair-group {
   min-height: 75px;
   max-height: 150px;
