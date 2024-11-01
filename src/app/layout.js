@@ -13,18 +13,18 @@ import "./globals.css";
 // });
 
 export const metadata = {
-  title: "Jax.IO",
-  description: "Page",
+    title: "Jax.IO",
+    description: "Page",
 };
 
 export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body
-        // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
-  );
+    return (
+        <html lang="en">
+            <body
+            // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
+                {children}
+            </body>
+        </html>
+    );
 }
