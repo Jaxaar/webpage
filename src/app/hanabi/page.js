@@ -1,13 +1,13 @@
 import Image from "next/image";
 
-export default function Home() {
+export default function Hanabi() {
     return (
         <div>
             <div className="font-bold">
                 Hello!
             </div>
             <div>
-                WIP... I Hope... Maybe got shelved... Idk
+                This is HL
             </div>
         </div>
     );

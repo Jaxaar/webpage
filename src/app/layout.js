@@ -1,16 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
-
-// const geistSans = localFont({
-//   src: "./fonts/GeistVF.woff",
-//   variable: "--font-geist-sans",
-//   weight: "100 900",
-// });
-// const geistMono = localFont({
-//   src: "./fonts/GeistMonoVF.woff",
-//   variable: "--font-geist-mono",
-//   weight: "100 900",
-// });
+import NavBar from "./ui/Navigation/NavBar";
 
 export const metadata = {
     title: "Jax.IO",
@@ -19,11 +9,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
-            <body
-            // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
+        <html lang="en" className = "h-full">
+            <body className = "h-full">
+                <NavBar></NavBar>
+
                 {children}
+
+                <div className = "bg-slate-500 h-4 w-full fixed left-0 bottom-0">
+                </div>
             </body>
         </html>
     );
