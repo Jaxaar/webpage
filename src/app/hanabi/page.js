@@ -2,6 +2,8 @@
 import Image from "next/image";
 import { hanabiGame } from "../lib/hanabiAPI";
 import { useState } from "react";
+import "./hanabiPage.css"
+
 
 export default function Hanabi() {
 
@@ -33,7 +35,7 @@ export default function Hanabi() {
                 <button onClick={test}>Test</button>
             </div>
             {game.gameInitialized &&
-                <div> 
+                <div className="bg-gray-500"> 
                     <div>
                         GAME:
                     </div>
@@ -41,7 +43,7 @@ export default function Hanabi() {
                         <div key={playerKey}>
                             <div>{player.name}</div>
                             {player.hand.map((card) =>(
-                                <span className="" key={getKey()}>{card.toString()}, </span>
+                                <span className={card.suit} key={getKey()}>{card.toString()}, </span>
                             ))}
                         </div>
                     ))}
