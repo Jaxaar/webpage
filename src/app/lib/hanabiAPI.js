@@ -86,16 +86,13 @@ function hanabiGame() {
         }
         const gameView = getGameDeepCopy()
         gameView.players[player].hand = []
-        console.log(gameView)
         return gameView
     }
 
     function castHandsToCards(game){
         for (let [pName, p] of Object.entries(game.players)){
-            console.log(p)
             let deck = []
             for(let c of p.hand){
-                console.log(c)
                 deck.push(new Card(c.suit, c.value))
             }
             p.hand = deck
