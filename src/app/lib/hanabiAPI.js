@@ -5,6 +5,11 @@ function hanabiGame() {
         gameInitialized: false,
         players: {},
         deck: [],
+        history: [],
+    }
+
+    function getGameDeepCopy () {
+        return JSON.parse(JSON.stringify(game))
     }
 
     class Card {
@@ -23,7 +28,7 @@ function hanabiGame() {
         }
     }
 
-    const initGame = (numPlayers = 4) => {
+    function initGame (numPlayers = 4) {
         console.log("Initializing Game")
         // Build Deck & Playing Field
         const colors = ["Red", "Blue", "Green", "Yellow", "White"]
@@ -68,19 +73,40 @@ function hanabiGame() {
         game.gameInitialized = true
     }
 
-    const shuffleDeck = () => {
+    function shuffleDeck() {
         game.deck = game.deck
             .map(value => ({ value, sort: Math.random() }))
             .sort((a, b) => a.sort - b.sort)
             .map(({ value }) => value)
     }
 
+    function getGameState(player = null) {
+        if(player === null){
+            return game
+        }
+        const gameView = getGameDeepCopy()
+        gameView.players[player].hand = []
+        console.log(gameView)
+        return gameView
+    }
 
-
+    function castHandsToCards(game){
+        for (let [pName, p] of Object.entries(game.players)){
+            console.log(p)
+            let deck = []
+            for(let c of p.hand){
+                console.log(c)
+                deck.push(new Card(c.suit, c.value))
+            }
+            p.hand = deck
+        }
+        return game
+    }
 
     return {
         initGame: initGame,
-        getGame: game,
+        getGameState: getGameState,
+        castHandsToCards: castHandsToCards,
     };
 }
 

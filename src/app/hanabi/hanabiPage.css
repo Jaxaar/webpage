@@ -13,3 +13,22 @@
 .Yellow {
     color: yellow;
 }
+
+
+.rand-button{
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    /* margin-top: 10px; */
+    /* margin-right: 8px; */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #007bff;
+    /* Blue color for edit button */
+}
+
+.rand-button:hover{
+    background-color: #0056b3;
+    /* Darker shade of blue on hover */
+}

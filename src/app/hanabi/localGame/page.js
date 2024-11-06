@@ -1,43 +1,63 @@
 'use client'
 import Image from "next/image";
-import { hanabiGame } from "../lib/hanabiAPI";
+import { hanabiGame } from "../../lib/hanabiAPI";
 import { useState } from "react";
-import "./hanabiPage.css"
+import { useSearchParams } from 'next/navigation'
+import "../hanabiPage.css"
 
 
-export default function Hanabi() {
+export default function HanabiLobby() {
+
+    const params = useSearchParams()
 
     // const localHanabiGame = {}
     let key = 0;
-    const getKey = () => {
+    function getKey() {
         key = key + 10
         return key
     }
+    const numPlayers = params.get("players") ? params.get("players") : 4
+    const playerID = "P1"
+    
 
-    const {initGame, getGame} = hanabiGame()
-    const [game, setGame] = useState(getGame)
+    const {initGame, getGameState, castHandsToCards} = hanabiGame()
+    const [game, setGame] = useState(getGameState)
 
-    const test = () => {
-        initGame()
-        console.log(getGame)
-        setGame(getGame)
+    let fullGame = getGameState()
+
+
+
+
+    function start() {
+        initGame(numPlayers)
+        fullGame = getGameState()
+        console.log(getGameState())
+        setGame(castHandsToCards(getGameState(playerID)))
+        console.log(getGameState(playerID))
     }
 
     return (
         <div>
             <div className="font-bold">
-                Hello!
+                Welcome to the game page!
             </div>
             <div>
-                This is HL
+                Players: {numPlayers}
             </div>
             <div>
-                <button onClick={test}>Test</button>
+                <button onClick={start} className="rand-button">Start</button>
             </div>
+
+
+
+
+
+
+
             {game.gameInitialized &&
                 <div className="bg-gray-500"> 
                     <div>
-                        GAME:
+                        GAME State:
                     </div>
                     {Object.entries(game.players).map(([playerKey, player]) => (
                         <div key={playerKey}>

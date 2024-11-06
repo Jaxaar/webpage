@@ -15,7 +15,7 @@ export default function NavBar() {
             </li>
             <li className="nav-item">
                 <div className="button-box">
-                    <Link  href= "/hanabi" className={usePathname === '/hanabi' ? 'nav-link active' : 'nav-link'}>Hanabi</Link>
+                    <Link  href= "/hanabi/lobby" className={usePathname ==='/hanabi/lobby' ? 'nav-link active' : 'nav-link'}>Hanabi</Link>
                 </div>
             </li>
         </ul>
