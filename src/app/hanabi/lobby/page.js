@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { hanabiGame } from "../../lib/hanabiAPI";
 import { useState } from "react";
-import "../hanabiPage.css"
+import "../HanabiUI/css/hanabiPage.css"
 
 
 export default function HanabiLobby() {

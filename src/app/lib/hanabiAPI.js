@@ -1,110 +1,208 @@
 
 
-function hanabiGame() {
-    let game = {
-        gameInitialized: false,
-        players: {},
-        deck: [],
-        history: [],
+
+class Card {
+    constructor(suit, value) {
+        this.suit = suit
+        this.value = value
     }
 
-    function getGameDeepCopy () {
-        return JSON.parse(JSON.stringify(game))
+    toString() {
+        return this.suit + " " + this.value
+    }
+    isSameSuitAs(otherCard){
+        return this.suit == otherCard.suit
+    }
+    isPrevCard(otherCard){
+        return (this.value + 1) == otherCard.value
+    }
+}
+
+class HanabiGame{
+
+    game;
+
+    constructor(){
+        this.game = {
+            gameInitialized: false,
+            players: {},
+            deck: [],
+            history: [],
+            tableau: {},
+        }
     }
 
-    class Card {
-        constructor(suit, value) {
-            this.suit = suit
-            this.value = value
-        }
-        toString() {
-            return this.suit + " " + this.value
-        }
-        isSameSuitAs(otherCard){
-            return this.suit == otherCard.suit
-        }
-        isPrevCard(otherCard){
-            return (this.value + 1) == otherCard.value
-        }
+    makeCard(card){
+        return new Card(card.suit, card. value)
     }
 
-    function initGame (numPlayers = 4) {
+    // TODO: Make more efficient
+    getGameDeepCopy () {
+        return this.castcardsToCards(JSON.parse(JSON.stringify(this.game)))
+    }
+    
+    castcardsToCards(gameImage){
+        for (let [pName, p] of Object.entries(gameImage.players)){
+            let deck = []
+            for(let c of p.hand){
+                deck.push(this.makeCard(c))
+            }
+            p.hand = deck
+        }
+        const newTab = {}
+        for(let [suit, card] of Object.entries(gameImage.tableau)){
+            newTab[suit] = this.makeCard(card)
+        }
+        gameImage.tableau = newTab
+        return gameImage
+    }
+
+    getGameState(player = null) {
+        if(player === null){
+            return this.game
+        }
+        const gameView = this.getGameDeepCopy()
+        const blankHand = []
+        for(let i = 1; i <= gameView.players[player].hand.length; i++){
+            blankHand.push(new Card("Card", i))
+        }
+        gameView.players[player].hand = blankHand
+        return gameView
+        return this.game
+    }
+
+    //TODO: Fix HORRIBLE function design to remove side-effects & general mess
+    initGame (numPlayers = 4) {
         console.log("Initializing Game")
-        // Build Deck & Playing Field
+        this.game.gameInitialized = false
+
+        // Build Deck & Tableau
+
         const colors = ["Red", "Blue", "Green", "Yellow", "White"]
         const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
+        const decksObj = this.buildDecks(colors, numberPairs)
+        // console.log("Deck:")
+        // console.log(decksObj.deck)
+        this.game.deck = decksObj.deck
+        this.game.tableau = decksObj.tableau
+
+        // Shuffle Deck
+        this.shuffleDeck()
+
+        // Init Markers
+        this.game.hints = 8
+        this.game.hintsUsed = 0
+        this.game.fuses = 3
+
+        // Deal
+        this.deal(numPlayers)
+
+        // Sets first player
+        this.game.players["P1"].activePlayer = true
+
+        // Sets Game Init Flag
+        this.game.gameInitialized = true
+    }
+
+    buildDecks(suits, valueCounts) {
         let deck = []
-        let playingField = []
-        for (const color of colors){
-            playingField.push(new Card(color, 0))
-            for (const number in numberPairs){
-                for(let i = 0; i < numberPairs[number]; i++){
-                    deck.push(new Card(color, number))
+        let tableau = {}
+        for (const suit of suits){
+            tableau[suit] = (new Card(suit, 0))
+            for (const value in valueCounts){
+                for(let i = 0; i < valueCounts[value]; i++){
+                    deck.push(new Card(suit, value))
                 }
             }
         }
-        // console.log("Deck:")
-        // console.log(deck)
-        game.deck = deck
-        game.playingField = playingField
+        return {
+            deck: deck,
+            tableau: tableau
+        }
+    }
 
-        // Shuffle Deck
-        shuffleDeck()
-
-        // Init Markers
-        game.hints = 8
-        game.hintsUsed = 0
-        game.fuses = 3
-
+    deal(numPlayers){
         const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
 
-        // Deal
         const players = {}
         for(let i = 1; i <= numPlayers; i++){
             players["P" + i] = {"name": "P" + i}
+            players["P" + i].activePlayer = false
             let hand = []
             for(let j = 0; j < numPlayersToCardsDealt[numPlayers]; j++){
-                hand.push(game.deck.pop())
+                hand.push(this.game.deck.pop())
             }
             players["P" + i].hand = hand
         }
-        game.players = players
-
-        game.gameInitialized = true
+        this.game.players = players
     }
 
-    function shuffleDeck() {
-        game.deck = game.deck
+    shuffleDeck() {
+        this.game.deck = this.game.deck
             .map(value => ({ value, sort: Math.random() }))
             .sort((a, b) => a.sort - b.sort)
             .map(({ value }) => value)
     }
 
-    function getGameState(player = null) {
-        if(player === null){
-            return game
-        }
-        const gameView = getGameDeepCopy()
-        gameView.players[player].hand = []
-        return gameView
-    }
-
-    function castHandsToCards(game){
-        for (let [pName, p] of Object.entries(game.players)){
-            let deck = []
-            for(let c of p.hand){
-                deck.push(new Card(c.suit, c.value))
+    // TODO: Make Smoother / faster
+    advancePlayer(){
+        let arrPlayers = []
+        let activePlayer = ""
+        for(let [playerName, player] of Object.entries(this.game.players)){
+            arrPlayers.push(playerName)
+            if(player.activePlayer){
+                activePlayer = playerName
+                player.activePlayer = false
             }
-            p.hand = deck
         }
-        return game
+        arrPlayers = arrPlayers.sort((a,b) => {
+            return parseInt(a.substring(1)) - parseInt(b.substring(1))
+        })
+
+        const inx = arrPlayers.indexOf(activePlayer)
+        if(inx+1 > arrPlayers.length - 1){
+            this.game.players[arrPlayers[0]].activePlayer = true
+            return this.game.players?.[arrPlayers[0]].name
+        } else{
+            this.game.players[arrPlayers[inx+1]].activePlayer = true
+            return this.game.players?.[arrPlayers[inx+1]].name
+        }
     }
 
-    return {
-        initGame: initGame,
-        getGameState: getGameState,
-        castHandsToCards: castHandsToCards,
-    };
+    // Index starts at 1 -> Cards in hand
+    playCard(player, index){
+        // console.log(player)
+        if(!this.game.gameInitialized || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
+            return undefined
+        }
+        
+        const card = this.game.players[player].hand[index-1]
+        console.log(card)
+
+        this.advancePlayer()
+        return "Hi"
+    }
+
+    canPlayCard(card){
+        
+    }
+
+
+
+    getActivePlayer(){
+        for(let [playerName, player] of Object.entries(this.game.players)){
+            if(player.activePlayer){
+                return playerName
+            }
+        }
+    }
+
+    // return {
+    //     initGame: initGame,
+    //     getGameState: getGameState,
+    //     playCard, playCard,
+    //     getActivePlayer, getActivePlayer,
+    // };
 }
 
-export {hanabiGame}
+export {HanabiGame}
