@@ -8,7 +8,18 @@ import "../HanabiUI/css/hanabiPage.css"
 import { Suspense } from 'react'
 
 
+
 export default function HanabiLobby() {
+
+    return (
+        <Suspense>
+            <ActualHanabiLobby></ActualHanabiLobby>
+        </Suspense>
+
+    )
+}
+
+function ActualHanabiLobby() {
 
     const params = useSearchParams()
 
@@ -101,7 +112,6 @@ export default function HanabiLobby() {
 
     return (
         <div className="m-2 ">
-            <Suspense>
             <div className="font-bold">
                 Welcome to the game page!
             </div>
@@ -206,7 +216,6 @@ export default function HanabiLobby() {
                     </div>
                 </div>
             }
-            </Suspense>
         </div>
     );
 }
