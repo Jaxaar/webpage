@@ -5,6 +5,7 @@ import Card from "../HanabiUI/Card";
 import { useState } from "react";
 import { useSearchParams } from 'next/navigation'
 import "../HanabiUI/css/hanabiPage.css"
+import { Suspense } from 'react'
 
 
 export default function HanabiLobby() {
@@ -56,8 +57,8 @@ export default function HanabiLobby() {
         // console.log(game.getGameState())
         // console.log(game.getGameState(playerID))
         // console.log(game)
-
         clearSelectedCard()
+        setPlayerID(game.getActivePlayer())
     }
 
     function cardSelected(suit, value, player, canSee, setClicked, index){
@@ -100,6 +101,7 @@ export default function HanabiLobby() {
 
     return (
         <div className="m-2 ">
+            <Suspense>
             <div className="font-bold">
                 Welcome to the game page!
             </div>
@@ -109,43 +111,58 @@ export default function HanabiLobby() {
             <button onClick={start} className="rand-button">Start</button>
             <button onClick={advPlayer} className="rand-button">ADV.</button>
 
-
-
             { game.game.gameInitialized &&
                 <div className="bg-gray-500 p-2"> 
                     {/* {console.log(game)} */}
                     <div>
-                        GAME State:
+                        <span>Game State:</span>
+                        <span className="ml-4">Hint tokens remaining: {game.game.hints}/{game.game.hintsUsed + game.game.hints}</span>
+                        <span className="ml-6">Fuses: {game.game.fuses}</span>
                     </div>
+
                     {/* Row Per Player */}
-                    <div>
-                        {Object.entries(game.getGameState(playerID).players).map(([playerKey, player]) => (
-                            <div key={playerKey} className="flex flex-row">
-                                <div className="m-2">
-                                    {player.activePlayer 
-                                    && <span className = "ml-1.5">{" > "}</span> 
-                                    || <span className= "ml-5"></span>
-                                    }
-                                    <span className="">{player.name}: </span>
+                    <div className="mt-3">
+                        <div>
+                            {Object.entries(game.getGameState(playerID).players).map(([playerKey, player]) => (
+                                <div key={playerKey} className="flex flex-row">
+                                    <div className="m-2">
+                                        {player.activePlayer 
+                                        && <span className = "ml-1.5">{" > "}</span> 
+                                        || <span className= "ml-5"></span>
+                                        }
+                                        <span className="">{player.name}: </span>
+                                    </div>
+                                    <div className="grid grid-cols-6 w-10/12 max-w-screen-sm">
+                                        {player.hand.map((card, index) =>(
+                                            // <span className={card.suit} key={getKey()}>{card.toString()}, </span>
+                                            <Card 
+                                                key={getKey()} 
+                                                suit={card.suit} 
+                                                value={card.value}
+                                                player={playerKey}
+                                                canSee={playerKey !== playerID} 
+                                                cardSelected = {cardSelected}
+                                                index={index+1}
+                                            ></Card>
+                                        ))}
+                                    </div>
                                 </div>
-                                <div className="grid grid-cols-6 w-10/12 max-w-screen-sm">
-                                    {player.hand.map((card, index) =>(
-                                        // <span className={card.suit} key={getKey()}>{card.toString()}, </span>
-                                        <Card 
-                                            key={getKey()} 
-                                            suit={card.suit} 
-                                            value={card.value}
-                                            player={playerKey}
-                                            canSee={playerKey !== playerID} 
-                                            cardSelected = {cardSelected}
-                                            index={index+1}
-                                        ></Card>
-                                    ))}
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        <div className="mt-2">
+                            <div>Tableau:</div>
+
+                            {Object.entries(game.game.tableau).map(([suit, card]) => (
+                                <Card 
+                                key={getKey()} 
+                                suit={card.suit} 
+                                value={card.value}
+                                notInteractable={true}
+                                ></Card>
+                            ))}
+                        </div>
                     </div>
-                    <div>
+                    <div className="mt-3">
                         {currentlySelectedCard.canSee === true &&
                         <div> {/* Other players card */}
                             <span  className= "mr-3">
@@ -155,7 +172,7 @@ export default function HanabiLobby() {
                                 Hint: {currentlySelectedCard.suit}
                             </button>
                             <button onClick={() => hint("value")}>
-                                Hint: {currentlySelectedCard.value}&apos;s
+                                Hint: {currentlySelectedCard.value}s
                             </button>
                         </div>
                         || currentlySelectedCard.canSee === false &&
@@ -174,8 +191,22 @@ export default function HanabiLobby() {
                         }
                         
                     </div>
+
+                    <div className="mt-8">
+                        <div>Discard:</div>
+
+                            {game.game.discard.map((card) => (
+                                <Card 
+                                key={getKey()} 
+                                suit={card.suit} 
+                                value={card.value}
+                                notInteractable={true}
+                                ></Card>
+                            ))}
+                    </div>
                 </div>
             }
+            </Suspense>
         </div>
     );
 }

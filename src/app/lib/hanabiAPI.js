@@ -28,7 +28,11 @@ class HanabiGame{
             players: {},
             deck: [],
             history: [],
+            discard: [],
             tableau: {},
+            hints: -1,
+            hintsUsed: -1,
+            fuses: -1,
         }
     }
 
@@ -178,13 +182,21 @@ class HanabiGame{
         
         const card = this.game.players[player].hand[index-1]
         console.log(card)
+        console.log(this.canPlayCard(card))
+
+        if(this.canPlayCard(card)){
+            this.game.tableau[card.suit] = card
+        }
+        else {
+            this.game.discard.push(card)
+        }
 
         this.advancePlayer()
         return "Hi"
     }
 
     canPlayCard(card){
-        
+        return this.game.tableau?.[card.suit].isPrevCard(card)
     }
 
 
