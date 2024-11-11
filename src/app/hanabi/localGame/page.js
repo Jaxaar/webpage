@@ -8,17 +8,6 @@ import "../HanabiUI/css/hanabiPage.css"
 import { Suspense } from 'react'
 
 
-
-export default function HanabiLobby() {
-
-    return (
-        <Suspense>
-            <ActualHanabiLobby></ActualHanabiLobby>
-        </Suspense>
-
-    )
-}
-
 function ActualHanabiLobby() {
 
     const params = useSearchParams()
@@ -86,10 +75,13 @@ function ActualHanabiLobby() {
 
     function hint(type){
         const targetPlayer = currentlySelectedCard.player
-        console.log("Hint " + type + " to: " + targetPlayer)
-        game.playCard(playerID, type, targetPlayer)
+        const targetVal = type==="suit" ? currentlySelectedCard.suit : currentlySelectedCard.value
+
+        console.log("Hint: " + targetVal + " to: " + targetPlayer)
+        game.handleHint(playerID, type, targetVal, targetPlayer)
 
         clearSelectedCard()
+        setPlayerID(game.getActivePlayer())
     }
 
     function playCard(){
@@ -105,9 +97,11 @@ function ActualHanabiLobby() {
     }
 
     function discardCard(){
-        console.log("disc")
+        console.log("discard: " + currentlySelectedCard.index)
+        const discVal = game.discardCard(playerID, currentlySelectedCard.index)
 
         clearSelectedCard()
+        setPlayerID(game.getActivePlayer())
     }
 
     return (
@@ -172,50 +166,70 @@ function ActualHanabiLobby() {
                             ))}
                         </div>
                     </div>
-                    <div className="mt-3">
-                        {currentlySelectedCard.canSee === true &&
-                        <div> {/* Other players card */}
-                            <span  className= "mr-3">
-                                To {currentlySelectedCard.player}:
-                            </span>
-                            <button onClick={() => hint("suit")} className= "mr-3">
-                                Hint: {currentlySelectedCard.suit}
-                            </button>
-                            <button onClick={() => hint("value")}>
-                                Hint: {currentlySelectedCard.value}s
-                            </button>
+                    {!game.game.gameEnded &&
+                        <div className="mt-3">
+                            {currentlySelectedCard.canSee === true &&
+                            <div> {/* Other players card */}
+                                <span  className= "mr-3">
+                                    To {currentlySelectedCard.player}:
+                                </span>
+                                {game.game.hints > 0 &&
+                                    <span>
+                                        <button onClick={() => hint("suit")} className= "mr-3">
+                                            Hint: {currentlySelectedCard.suit}
+                                        </button>
+                                        <button onClick={() => hint("value")}>
+                                            Hint: {currentlySelectedCard.value}s
+                                        </button>
+                                    </span>
+                                    ||
+                                    <span>No Hints Remaining...</span>
+                                }
+                            </div>
+                            || currentlySelectedCard.canSee === false &&
+                            <div> {/* This players card */}
+                                <button onClick={playCard} className= "mr-3">
+                                    Play: {currentlySelectedCard.suit + " " + currentlySelectedCard.value}
+                                </button>
+                                <button onClick={discardCard}>
+                                    Discard: {currentlySelectedCard.suit + " " + currentlySelectedCard.value}
+                                </button>
+                            </div>
+                            || currentlySelectedCard.canSee == undefined &&
+                            <div> {/* No card */}
+                                Select a Card
+                            </div>
+                            }
+                            
                         </div>
-                        || currentlySelectedCard.canSee === false &&
-                        <div> {/* This players card */}
-                            <button onClick={playCard} className= "mr-3">
-                                Play: {currentlySelectedCard.suit + " " + currentlySelectedCard.value}
-                            </button>
-                            <button onClick={discardCard}>
-                                Discard: {currentlySelectedCard.suit + " " + currentlySelectedCard.value}
-                            </button>
-                        </div>
-                        || currentlySelectedCard.canSee == undefined &&
-                        <div> {/* No card */}
-                            Select a Card
-                        </div>
-                        }
-                        
-                    </div>
+                        ||
+                        <div className="mt-2"> Game Over! Score: {game.scoreGame()}</div>
+                    }
+                        <div className="mt-8">
+                            <div>Discard:</div>
 
-                    <div className="mt-8">
-                        <div>Discard:</div>
-
-                            {game.game.discard.map((card) => (
-                                <Card 
-                                key={getKey()} 
-                                suit={card.suit} 
-                                value={card.value}
-                                notInteractable={true}
-                                ></Card>
-                            ))}
-                    </div>
+                                {game.game.discard.map((card) => (
+                                    <Card 
+                                    key={getKey()} 
+                                    suit={card.suit} 
+                                    value={card.value}
+                                    notInteractable={true}
+                                    ></Card>
+                                ))}
+                        </div> 
                 </div>
             }
         </div>
     );
+}
+
+
+export default function HanabiLobby() {
+
+    return (
+        <Suspense>
+            <ActualHanabiLobby></ActualHanabiLobby>
+        </Suspense>
+
+    )
 }

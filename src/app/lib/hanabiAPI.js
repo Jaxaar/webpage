@@ -14,7 +14,7 @@ class Card {
         return this.suit == otherCard.suit
     }
     isPrevCard(otherCard){
-        return (this.value + 1) == otherCard.value
+        return (parseInt(this.value) + 1) == otherCard.value
     }
 }
 
@@ -25,6 +25,7 @@ class HanabiGame{
     constructor(){
         this.game = {
             gameInitialized: false,
+            gameEnded: false,
             players: {},
             deck: [],
             history: [],
@@ -77,6 +78,19 @@ class HanabiGame{
 
     //TODO: Fix HORRIBLE function design to remove side-effects & general mess
     initGame (numPlayers = 4) {
+        this.game = {
+            gameInitialized: false,
+            gameEnded: false,
+            players: {},
+            deck: [],
+            history: [],
+            discard: [],
+            tableau: {},
+            hints: -1,
+            hintsUsed: -1,
+            fuses: -1,
+        }
+
         console.log("Initializing Game")
         this.game.gameInitialized = false
 
@@ -176,30 +190,92 @@ class HanabiGame{
     // Index starts at 1 -> Cards in hand
     playCard(player, index){
         // console.log(player)
-        if(!this.game.gameInitialized || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
+        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
             return undefined
         }
         
         const card = this.game.players[player].hand[index-1]
-        console.log(card)
-        console.log(this.canPlayCard(card))
 
         if(this.canPlayCard(card)){
             this.game.tableau[card.suit] = card
+
+            if(card.value === 5 && this.game.hintsUsed > 0){
+                this.game.hints = this.game.hints + 1
+                this.game.hintsUsed = this.game.hintsUsed - 1
+            }
         }
         else {
             this.game.discard.push(card)
+            this.game.fuses = this.game.fuses - 1
         }
 
+        this.game.players[player].hand[index-1] = this.drawCard()
+
+        this.checkGameOver()
         this.advancePlayer()
-        return "Hi"
+        return this.game.players[player].hand[index-1]
+    }
+
+    // Index starts at 1 -> Cards in hand
+    discardCard(player, index){
+        // console.log(player)
+        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
+            return undefined
+        }
+        
+        const card = this.game.players[player].hand[index-1]
+
+        this.game.discard.push(card)
+
+        if(this.game.hintsUsed > 0){
+            this.game.hints = this.game.hints + 1
+            this.game.hintsUsed = this.game.hintsUsed - 1
+        }
+
+        this.game.players[player].hand[index-1] = this.drawCard()
+
+        this.checkGameOver()
+        this.advancePlayer()
+        return this.game.players[player].hand[index-1]
+    }
+
+    handleHint(turnPlayer, type, targetVal, targetPlayer){
+        if(this.game.hints < 1){
+            return undefined
+        }
+
+        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(turnPlayer) == -1) || !(this.game?.players?.[turnPlayer].activePlayer) || !this.game.players?.[targetPlayer]?.hand){
+            return undefined
+        }
+
+        let indexes = []
+        this.game?.players[targetPlayer]?.hand
+        for(let i = 0; i < this.game.players[targetPlayer].hand.length; i++){
+            const card = this.game.players[targetPlayer].hand[i]
+            if(type == "suit" && card.suit == targetVal){
+                indexes.push(i+1)
+            }
+            else if(type == "value" && card.value == targetVal){
+                indexes.push(i+1)
+            }
+        }
+        console.log(`"${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}"`)
+
+
+        this.game.hints = this.game.hints - 1
+        this.game.hintsUsed = this.game.hintsUsed + 1
+
+        this.checkGameOver()
+        this.advancePlayer()
     }
 
     canPlayCard(card){
         return this.game.tableau?.[card.suit].isPrevCard(card)
     }
 
-
+    drawCard(){
+        return this.game.deck.pop()
+    }
 
     getActivePlayer(){
         for(let [playerName, player] of Object.entries(this.game.players)){
@@ -207,6 +283,36 @@ class HanabiGame{
                 return playerName
             }
         }
+    }
+
+    checkGameOver(){
+        if(this.game.fuses < 1 || this.game.deck.length < 1){
+            this.gameOver()
+        }
+        let all5s = true
+        for(let [suit, card] of Object.entries(this.game.tableau)){
+            if(card.value !== 5){
+                all5s = false
+            }
+        }
+        if(all5s){
+            this.gameOver()
+        }
+    }
+
+    gameOver(){
+
+        console.log("Game Over")
+        this.game.gameEnded = true
+    }
+
+    scoreGame(){
+        let sum = 0;
+
+        for(let [suit, card] of Object.entries(this.game.tableau)){
+            sum += parseInt(card.value)
+        }
+        return sum
     }
 
     // return {
