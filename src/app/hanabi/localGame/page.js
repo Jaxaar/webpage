@@ -73,17 +73,10 @@ export default function HanabiLobby() {
     }
 
     function hint(type){
-        if(type === "suit"){
-            console.log("Hint suit")
-
-
-        } else if (type === "value"){
-            console.log("Hint value")
-
-
-        }
+        const targetPlayer = currentlySelectedCard.player
+        console.log("Hint " + type + " to: " + targetPlayer)
         game.playCard(playerID, type, targetPlayer)
-        
+
         clearSelectedCard()
     }
 
@@ -162,7 +155,7 @@ export default function HanabiLobby() {
                                 Hint: {currentlySelectedCard.suit}
                             </button>
                             <button onClick={() => hint("value")}>
-                                Hint: {currentlySelectedCard.value}'s
+                                Hint: {currentlySelectedCard.value}&apos;s
                             </button>
                         </div>
                         || currentlySelectedCard.canSee === false &&
