@@ -259,7 +259,7 @@ class HanabiGame{
                 indexes.push(i+1)
             }
         }
-        console.log(`"${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}"`)
+        console.info(`"${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}"`)
 
 
         this.game.hints = this.game.hints - 1

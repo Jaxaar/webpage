@@ -34,6 +34,8 @@ function ActualHanabiLobby() {
     })
 
     const [update, setUpdate] = useState(true)
+    const [spoilerWall, setSpoilerWall] = useState(false)
+    const [useSpoilerWall, setUseSpoilerWall] = useState(false)
 
     // let fullGame = game.getGameState()
     
@@ -80,6 +82,10 @@ function ActualHanabiLobby() {
         console.log("Hint: " + targetVal + " to: " + targetPlayer)
         game.handleHint(playerID, type, targetVal, targetPlayer)
 
+        if(useSpoilerWall){
+            setSpoilerWall(true)
+        }
+
         clearSelectedCard()
         setPlayerID(game.getActivePlayer())
     }
@@ -88,6 +94,10 @@ function ActualHanabiLobby() {
         console.log("play: " + currentlySelectedCard.index)
         const playVal = game.playCard(playerID, currentlySelectedCard.index)
         // console.log(playVal)
+        if(useSpoilerWall){
+            setSpoilerWall(true)
+        }
+
         clearSelectedCard()
         setPlayerID(game.getActivePlayer())
     }
@@ -99,6 +109,10 @@ function ActualHanabiLobby() {
     function discardCard(){
         console.log("discard: " + currentlySelectedCard.index)
         const discVal = game.discardCard(playerID, currentlySelectedCard.index)
+
+        if(useSpoilerWall){
+            setSpoilerWall(true)
+        }
 
         clearSelectedCard()
         setPlayerID(game.getActivePlayer())
@@ -113,7 +127,8 @@ function ActualHanabiLobby() {
                 Players: {numPlayers}
             </div>
             <button onClick={start} className="rand-button">Start</button>
-            <button onClick={advPlayer} className="rand-button">ADV.</button>
+            {/* <button onClick={advPlayer} className="rand-button">ADV.</button> */}
+            <button onClick={() => setUseSpoilerWall(!useSpoilerWall)} className="rand-button">Toggle Spoiler Wall - {useSpoilerWall ? "Off" : "On"}</button>
 
             { game.game.gameInitialized &&
                 <div className="bg-gray-500 p-2"> 
@@ -124,8 +139,9 @@ function ActualHanabiLobby() {
                         <span className="ml-6">Fuses: {game.game.fuses}</span>
                     </div>
 
-                    {/* Row Per Player */}
+                    { !spoilerWall &&
                     <div className="mt-3">
+                        {/* Row Per Player */}
                         <div>
                             {Object.entries(game.getGameState(playerID).players).map(([playerKey, player]) => (
                                 <div key={playerKey} className="flex flex-row">
@@ -166,6 +182,9 @@ function ActualHanabiLobby() {
                             ))}
                         </div>
                     </div>
+                    ||
+                    <div className="rand-button" onClick={() => setSpoilerWall(false)}>{playerID + "'s"} Turn - Click To Show</div>
+                    }
                     {!game.game.gameEnded &&
                         <div className="mt-3">
                             {currentlySelectedCard.canSee === true &&
