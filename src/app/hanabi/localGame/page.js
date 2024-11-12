@@ -1,6 +1,5 @@
 'use client'
-import Image from "next/image";
-import { HanabiGame } from "../../lib/hanabiAPI";
+import { HanabiAPI } from "../../lib/hanabiAPI";
 import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
 import Card from "../HanabiUI/Card";
 import { useState, useEffect, useRef } from "react";

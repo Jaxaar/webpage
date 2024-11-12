@@ -322,4 +322,4 @@ function makeCard(card){
     return new Card(card.suit, card. value)
 }
 
-export {HanabiGame, Card, castcardsToCards}
+export {HanabiAPI, Card, castcardsToCards}
