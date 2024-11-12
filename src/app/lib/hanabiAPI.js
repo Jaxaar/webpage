@@ -1,3 +1,4 @@
+import { LocalHanabiGame } from "./LocalHanabiGame"
 
 
 
@@ -18,31 +19,16 @@ class Card {
     }
 }
 
-class HanabiGame{
+class HanabiAPI{
 
-    game;
-
-    constructor(){
-        this.game = {
-            gameInitialized: false,
-            gameEnded: false,
-            players: {},
-            deck: [],
-            history: [],
-            discard: [],
-            tableau: {},
-            hints: -1,
-            hintsUsed: -1,
-            fuses: -1,
+    constructor(local, playerCount){
+        if(local){
+            this.game = new LocalHanabiGame()
         }
     }
 
-    // TODO: Make more efficient
-    getGameDeepCopy () {
-        return castcardsToCards(JSON.parse(JSON.stringify(this.game)))
-    }
 
-    getGameState(player = null) {
+    getGameImage(player = null) {
         if(player === null){
             return this.game
         }

@@ -23,7 +23,7 @@ function ActualHanabiLobby() {
     
 
     // const {initGame, getGameState, playCard, getActivePlayer} = hanabiGame()
-    const [game, setGame] = useState(new LocalHanabiGame())
+    const [game, setGame] = useState({})
     const [playerID, setPlayerID] = useState("P1")
     const [currentlySelectedCard, setCurrentlySelectedCard] = useState({
         setClicked: () => {},
@@ -63,7 +63,8 @@ function ActualHanabiLobby() {
     }
 
     function start() {
-        game.initGame(numPlayers)
+        // game.initGame()
+        setGame(new LocalHanabiGame(numPlayers))
         // fullGame = game.getGameState()
         // setGame(game.getGameState(playerID))
         
@@ -71,7 +72,7 @@ function ActualHanabiLobby() {
         // console.log(game.getGameState(playerID))
         // console.log(game)
         clearSelectedCard()
-        setPlayerID(game.getActivePlayer())
+        // setPlayerID(game.getActivePlayer())
     }
 
     function cardSelected(suit, value, player, canSee, setClicked, index){
@@ -186,7 +187,7 @@ function ActualHanabiLobby() {
                         <div className="mt-3">
                             {/* Row Per Player */}
                             <div>
-                                {Object.entries(game.getGameState(playerID).players).map(([playerKey, player]) => (
+                                {Object.entries(game.getGameImage(playerID).players).map(([playerKey, player]) => (
                                     <div key={playerKey} className="flex flex-row">
                                         <div className="m-2">
                                             {player.activePlayer 

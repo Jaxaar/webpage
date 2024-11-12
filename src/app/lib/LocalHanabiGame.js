@@ -2,7 +2,8 @@ import { Card , castcardsToCards } from "./hanabiAPI";
 
 class LocalHanabiGame{
 
-    constructor(){
+    constructor(numPlayers = 4){
+        this.numPlayers = numPlayers
         this.gameInitialized = false
         this.gameEnded = false
         this.players = {}
@@ -13,51 +14,17 @@ class LocalHanabiGame{
         this.hints = -1
         this.hintsUsed = -1
         this.fuses = -1
+
+        this.initGame()
     }
 
-    makeCard(card){
-        return new Card(card.suit, card.value)
-    }
 
-    // TODO: Make more efficient
-    getGameDeepCopy () {
-        return castcardsToCards(JSON.parse(JSON.stringify(this)))
-    }
-
-    getGameState(player = null) {
-        if(player === null){
-            return this.game
-        }
-        const gameView = this.getGameDeepCopy()
-        const blankHand = []
-        for(let i = 1; i <= gameView.players[player].hand.length; i++){
-            blankHand.push(new Card("Card", i))
-        }
-        gameView.players[player].hand = blankHand
-        return gameView
-        return this.game
-    }
-
-    //TODO: Fix HORRIBLE function design to remove side-effects & general mess
-    initGame (numPlayers = 4) {
-        this.game = {
-            gameInitialized: false,
-            gameEnded: false,
-            players: {},
-            deck: [],
-            history: [],
-            discard: [],
-            tableau: {},
-            hints: -1,
-            hintsUsed: -1,
-            fuses: -1,
-        }
+    //TODO: Fix general mess
+    initGame () {
 
         console.log("Initializing Game")
-        this.gameInitialized = false
 
         // Build Deck & Tableau
-
         const colors = ["Red", "Blue", "Green", "Yellow", "White"]
         const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
         const decksObj = this.buildDecks(colors, numberPairs)
@@ -67,16 +34,17 @@ class LocalHanabiGame{
         this.tableau = decksObj.tableau
 
         // Shuffle Deck
-        this.shuffleDeck()
+        this.deck = this.shuffleDeck(this.deck)
 
         // Init Markers
         this.hints = 8
         this.hintsUsed = 0
         this.fuses = 3
 
-        // Deal
-        this.deal(numPlayers)
-
+        // Deal & Init Players
+        const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
+        this.players = this.deal(this.numPlayers, numPlayersToCardsDealt)
+        console.log(this.players)
         // Sets first player
         this.players["P1"].activePlayer = true
 
@@ -101,9 +69,7 @@ class LocalHanabiGame{
         }
     }
 
-    deal(numPlayers){
-        const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
-
+    deal(numPlayers, numPlayersToCardsDealt){
         const players = {}
         for(let i = 1; i <= numPlayers; i++){
             players["P" + i] = {"name": "P" + i}
@@ -114,39 +80,35 @@ class LocalHanabiGame{
             }
             players["P" + i].hand = hand
         }
-        this.players = players
+        return players
     }
 
-    shuffleDeck() {
-        this.deck = this.deck
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value)
+    shuffleDeck(deck) {
+        return deck.map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value)
     }
 
-    // TODO: Make Smoother / faster
-    advancePlayer(){
-        let arrPlayers = []
-        let activePlayer = ""
-        for(let [playerName, player] of Object.entries(this.players)){
-            arrPlayers.push(playerName)
-            if(player.activePlayer){
-                activePlayer = playerName
-                player.activePlayer = false
-            }
-        }
-        arrPlayers = arrPlayers.sort((a,b) => {
-            return parseInt(a.substring(1)) - parseInt(b.substring(1))
-        })
+    makeCard(card){
+        return new Card(card.suit, card.value)
+    }
 
-        const inx = arrPlayers.indexOf(activePlayer)
-        if(inx+1 > arrPlayers.length - 1){
-            this.players[arrPlayers[0]].activePlayer = true
-            return this.players?.[arrPlayers[0]].name
-        } else{
-            this.players[arrPlayers[inx+1]].activePlayer = true
-            return this.players?.[arrPlayers[inx+1]].name
+    // TODO: Make more efficient
+    getGameDeepCopy () {
+        return castcardsToCards(JSON.parse(JSON.stringify(this)))
+    }
+
+    getGameImage(player = null) {
+        if(player === null){
+            return this
         }
+        const gameView = this.getGameDeepCopy()
+        const blankHand = []
+        for(let i = 1; i <= gameView.players[player].hand.length; i++){
+            blankHand.push(new Card("Card", i))
+        }
+        gameView.players[player].hand = blankHand
+        return gameView
     }
 
     // Index starts at 1 -> Cards in hand
@@ -240,6 +202,33 @@ class LocalHanabiGame{
         this.advancePlayer()
         return hintStr
     }
+
+    
+    // TODO: Make Smoother / faster
+    advancePlayer(){
+        let arrPlayers = []
+        let activePlayer = ""
+        for(let [playerName, player] of Object.entries(this.players)){
+            arrPlayers.push(playerName)
+            if(player.activePlayer){
+                activePlayer = playerName
+                player.activePlayer = false
+            }
+        }
+        arrPlayers = arrPlayers.sort((a,b) => {
+            return parseInt(a.substring(1)) - parseInt(b.substring(1))
+        })
+
+        const inx = arrPlayers.indexOf(activePlayer)
+        if(inx+1 > arrPlayers.length - 1){
+            this.players[arrPlayers[0]].activePlayer = true
+            return this.players?.[arrPlayers[0]].name
+        } else{
+            this.players[arrPlayers[inx+1]].activePlayer = true
+            return this.players?.[arrPlayers[inx+1]].name
+        }
+    }
+
 
     canPlayCard(card){
         return this.tableau?.[card.suit].isPrevCard(card)
