@@ -148,13 +148,24 @@ function ActualHanabiLobby() {
                 <div className="bg-gray-500 p-2 flex flex-row"> 
                     <div>
                         {/* {console.log(game)} */}
-                        <div>
-                            <div>Game State:</div>
+                        {/* <div>Game State:</div> */}
+                        <div className="mt-2">
+                                <div className="mb-1">Tableau:</div>
+                                
+                                {Object.entries(game.game.tableau).map(([suit, card]) => (
+                                    <Card 
+                                    key={getKey()} 
+                                    suit={card.suit} 
+                                    value={card.value}
+                                    notInteractable={true}
+                                    ></Card>
+                                ))}
+                        </div>
+                        <div className="mt-2">
                             <span className="">Cards left: {game.game.deck.length}</span>
                             <span className="ml-4">Hint tokens remaining: {game.game.hints}/{game.game.hintsUsed + game.game.hints}</span>
                             <span className="ml-6">Fuses: {game.game.fuses}</span>
                         </div>
-
                         { !spoilerWall &&
                         <div className="mt-3">
                             {/* Row Per Player */}
@@ -183,18 +194,6 @@ function ActualHanabiLobby() {
                                             ))}
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                            <div className="mt-2">
-                                <div>Tableau:</div>
-
-                                {Object.entries(game.game.tableau).map(([suit, card]) => (
-                                    <Card 
-                                    key={getKey()} 
-                                    suit={card.suit} 
-                                    value={card.value}
-                                    notInteractable={true}
-                                    ></Card>
                                 ))}
                             </div>
                         </div>
@@ -244,8 +243,8 @@ function ActualHanabiLobby() {
                             </div>
                         }
                         <div className="mt-8">
-                            <div>Discard:</div>
-
+                            <div className="ml-1">Discard:</div>
+                            <div className="mt-2 grid grid-cols-6 grid-flow-row w-[29rem] gap-y-4">
                                 {game.game.discard.map((card) => (
                                     <Card 
                                     key={getKey()} 
@@ -254,6 +253,7 @@ function ActualHanabiLobby() {
                                     notInteractable={true}
                                     ></Card>
                                 ))}
+                            </div>
                         </div> 
                     </div>
                     <div className="bg-white p-2 w-[26rem]">
