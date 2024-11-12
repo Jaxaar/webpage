@@ -196,7 +196,8 @@ class HanabiGame{
         
         const card = this.game.players[player].hand[index-1]
 
-        if(this.canPlayCard(card)){
+        const successfulPlay = this.canPlayCard(card)
+        if(successfulPlay){
             this.game.tableau[card.suit] = card
 
             if(card.value === 5 && this.game.hintsUsed > 0){
@@ -210,6 +211,10 @@ class HanabiGame{
         }
 
         this.game.players[player].hand[index-1] = this.drawCard()
+
+        const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discard."}`
+        console.info(playStr)
+        this.game.history.push(playStr)
 
         this.checkGameOver()
         this.advancePlayer()
@@ -233,6 +238,10 @@ class HanabiGame{
         }
 
         this.game.players[player].hand[index-1] = this.drawCard()
+
+        const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
+        console.info(discStr)
+        this.game.history.push(discStr)
 
         this.checkGameOver()
         this.advancePlayer()
@@ -259,7 +268,10 @@ class HanabiGame{
                 indexes.push(i+1)
             }
         }
-        console.info(`"${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}"`)
+
+        const hintStr = `${turnPlayer}: Hints - "${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
+        console.info(hintStr)
+        this.game.history.push(hintStr)
 
 
         this.game.hints = this.game.hints - 1
@@ -301,8 +313,9 @@ class HanabiGame{
     }
 
     gameOver(){
-
-        console.log("Game Over")
+        const gameOverMessage = "Game Over! Score: " + this.scoreGame()
+        console.info("Game Over! Score: " + this.scoreGame())
+        this.game.history.push(gameOverMessage)
         this.game.gameEnded = true
     }
 
