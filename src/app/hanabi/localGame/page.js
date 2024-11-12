@@ -1,6 +1,7 @@
 'use client'
 import Image from "next/image";
 import { HanabiGame } from "../../lib/hanabiAPI";
+import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
 import Card from "../HanabiUI/Card";
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from 'next/navigation'
@@ -22,7 +23,7 @@ function ActualHanabiLobby() {
     
 
     // const {initGame, getGameState, playCard, getActivePlayer} = hanabiGame()
-    const [game, setGame] = useState(new HanabiGame())
+    const [game, setGame] = useState(new LocalHanabiGame())
     const [playerID, setPlayerID] = useState("P1")
     const [currentlySelectedCard, setCurrentlySelectedCard] = useState({
         setClicked: () => {},
@@ -90,7 +91,11 @@ function ActualHanabiLobby() {
         const targetVal = type==="suit" ? currentlySelectedCard.suit : currentlySelectedCard.value
 
         console.log("Hint: " + targetVal + " to: " + targetPlayer)
-        game.handleHint(playerID, type, targetVal, targetPlayer)
+        const hintVal = game.handleHint(playerID, type, targetVal, targetPlayer)
+        if(hintVal === undefined){
+            console.info("Action Failed")
+            return
+        }
 
         if(useSpoilerWall){
             setSpoilerWall(true)
@@ -103,6 +108,12 @@ function ActualHanabiLobby() {
     function playCard(){
         console.log("play: " + currentlySelectedCard.index)
         const playVal = game.playCard(playerID, currentlySelectedCard.index)
+
+        if(playVal === undefined){
+            console.info("Action Failed")
+            return
+        }
+
         // console.log(playVal)
         if(useSpoilerWall){
             setSpoilerWall(true)
@@ -120,6 +131,11 @@ function ActualHanabiLobby() {
         console.log("discard: " + currentlySelectedCard.index)
         const discVal = game.discardCard(playerID, currentlySelectedCard.index)
 
+        if(discVal === undefined){
+            console.info("Action Failed")
+            return
+        }
+
         if(useSpoilerWall){
             setSpoilerWall(true)
         }
@@ -136,35 +152,35 @@ function ActualHanabiLobby() {
             <div>
                 Players: {numPlayers}
             </div>
-            { !game.game.gameInitialized &&
+            { !game.gameInitialized &&
                 <div>
-                    <button onClick={start} className="rand-button">{game.game.gameInitialized ? "Restart?" : "Start"}</button>
+                    <button onClick={start} className="rand-button">{game.gameInitialized ? "Restart?" : "Start"}</button>
                     {/* <button onClick={advPlayer} className="rand-button">ADV.</button> */}
                     <button onClick={() => setUseSpoilerWall(!useSpoilerWall)} className="rand-button">Turn Spoiler Wall {useSpoilerWall ? "Off" : "On"}</button>
                 </div>
             }
         
-            { game.game.gameInitialized &&
+            { game.gameInitialized &&
                 <div className="bg-gray-500 p-2 flex flex-row"> 
                     <div>
                         {/* {console.log(game)} */}
                         {/* <div>Game State:</div> */}
                         <div className="mt-2">
-                                <div className="mb-1">Tableau:</div>
-                                
-                                {Object.entries(game.game.tableau).map(([suit, card]) => (
-                                    <Card 
-                                    key={getKey()} 
-                                    suit={card.suit} 
-                                    value={card.value}
-                                    notInteractable={true}
-                                    ></Card>
-                                ))}
+                            <div className="mb-1">Tableau:</div>
+                            
+                            {Object.entries(game.tableau).map(([suit, card]) => (
+                                <Card 
+                                key={getKey()} 
+                                suit={card.suit} 
+                                value={card.value}
+                                notInteractable={true}
+                                ></Card>
+                            ))}
                         </div>
                         <div className="mt-2">
-                            <span className="">Cards left: {game.game.deck.length}</span>
-                            <span className="ml-4">Hint tokens remaining: {game.game.hints}/{game.game.hintsUsed + game.game.hints}</span>
-                            <span className="ml-6">Fuses: {game.game.fuses}</span>
+                            <span className="">Cards left: {game.deck.length}</span>
+                            <span className="ml-4">Hint tokens remaining: {game.hints}/{game.hintsUsed + game.hints}</span>
+                            <span className="ml-6">Fuses: {game.fuses}</span>
                         </div>
                         { !spoilerWall &&
                         <div className="mt-3">
@@ -200,14 +216,14 @@ function ActualHanabiLobby() {
                         ||
                         <div className="rand-button" onClick={() => setSpoilerWall(false)}>{playerID + "'s"} Turn - Click To Show</div>
                         }
-                        {!game.game.gameEnded &&
+                        {!game.gameEnded &&
                             <div className="mt-3">
                                 {currentlySelectedCard.canSee === true &&
                                 <div> {/* Other players card */}
                                     <span  className= "mr-3">
                                         To {currentlySelectedCard.player}:
                                     </span>
-                                    {game.game.hints > 0 &&
+                                    {game.hints > 0 &&
                                         <span>
                                             <button onClick={() => hint("suit")} className= "mr-3">
                                                 Hint: {currentlySelectedCard.suit}
@@ -245,7 +261,7 @@ function ActualHanabiLobby() {
                         <div className="mt-8">
                             <div className="ml-1">Discard:</div>
                             <div className="mt-2 grid grid-cols-6 grid-flow-row w-[29rem] gap-y-4">
-                                {game.game.discard.map((card) => (
+                                {game.discard.map((card) => (
                                     <Card 
                                     key={getKey()} 
                                     suit={card.suit} 
@@ -259,7 +275,7 @@ function ActualHanabiLobby() {
                     <div className="bg-white p-2 w-[26rem]">
                         <div className="font-bold">Transcript</div>
                         <div className="overflow-auto max-h-72">
-                            {game.game.history.map((event) => (
+                            {game.history.map((event) => (
                                 <div key={getKey()}>{event}</div>
                             ))}
                             <div ref={transcriptEnd}></div>
