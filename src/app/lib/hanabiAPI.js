@@ -322,4 +322,8 @@ function makeCard(card){
     return new Card(card.suit, card. value)
 }
 
-export {HanabiAPI, Card, castcardsToCards}
+function makeGameFromJSON(game){
+    return castcardsToCards(JSON.parse(game))
+}
+
+export {HanabiAPI, Card, castcardsToCards, makeGameFromJSON}

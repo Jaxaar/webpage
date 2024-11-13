@@ -44,7 +44,6 @@ class LocalHanabiGame{
         // Deal & Init Players
         const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
         this.players = this.deal(this.numPlayers, numPlayersToCardsDealt)
-        console.log(this.players)
         // Sets first player
         this.players["P1"].activePlayer = true
 
@@ -136,7 +135,7 @@ class LocalHanabiGame{
 
         this.players[player].hand[index-1] = this.drawCard()
 
-        const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discard."}`
+        const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
         console.info(playStr)
         this.history.push(playStr)
 
@@ -281,12 +280,9 @@ class LocalHanabiGame{
         return sum
     }
 
-    // return {
-    //     initGame: initGame,
-    //     getGameState: getGameState,
-    //     playCard, playCard,
-    //     getActivePlayer, getActivePlayer,
-    // };
+    toString(){
+        return JSON.stringify(this)
+    }
 }
 
 export {LocalHanabiGame}

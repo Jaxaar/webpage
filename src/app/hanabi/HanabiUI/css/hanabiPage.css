@@ -32,11 +32,3 @@
     background-color: #0056b3;
     /* Darker shade of blue on hover */
 }
-
-.card:hover{
-    background-color: #6e6d6d;
-}
-
-.card-clicked.card-clicked{
-    background-color: #5c5c5c;
-}

@@ -1,5 +1,5 @@
 'use client'
-import { HanabiAPI } from "../../lib/hanabiAPI";
+import { HanabiAPI, makeGameFromJSON } from "../../lib/hanabiAPI";
 import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
 import Card from "../HanabiUI/Card";
 import { useState, useEffect, useRef } from "react";
@@ -19,10 +19,13 @@ function ActualHanabiLobby() {
         return key
     }
     const numPlayers = params.get("players") ? params.get("players") : 4
-    
+
+    function setInitGame(){
+        return Object.assign(new LocalHanabiGame, makeGameFromJSON(sessionStorage.getItem("CurLocalHanabiGame")))
+    }
 
     // const {initGame, getGameState, playCard, getActivePlayer} = hanabiGame()
-    const [game, setGame] = useState({})
+    const [game, setGame] = useState(setInitGame)
     const [playerID, setPlayerID] = useState("P1")
     const [currentlySelectedCard, setCurrentlySelectedCard] = useState({
         setClicked: () => {},
@@ -63,14 +66,14 @@ function ActualHanabiLobby() {
 
     function start() {
         // game.initGame()
-        setGame(new LocalHanabiGame(numPlayers))
+        // setGame(new LocalHanabiGame(numPlayers))
         // fullGame = game.getGameState()
         // setGame(game.getGameState(playerID))
         
         // console.log(game.getGameState())
         // console.log(game.getGameState(playerID))
         // console.log(game)
-        clearSelectedCard()
+        // clearSelectedCard()
         // setPlayerID(game.getActivePlayer())
     }
 
@@ -150,7 +153,7 @@ function ActualHanabiLobby() {
                 Welcome to the game page!
             </div>
             <div>
-                Players: {numPlayers}
+                Players: {game.numPlayers}
             </div>
             { !game.gameInitialized &&
                 <div>
@@ -159,9 +162,8 @@ function ActualHanabiLobby() {
                     <button onClick={() => setUseSpoilerWall(!useSpoilerWall)} className="rand-button">Turn Spoiler Wall {useSpoilerWall ? "Off" : "On"}</button>
                 </div>
             }
-        
             { game.gameInitialized &&
-                <div className="bg-gray-500 p-2 flex flex-row"> 
+                <div className="p-2 flex flex-row max-w-[61rem] border-black border-2"> 
                     <div>
                         {/* {console.log(game)} */}
                         {/* <div>Game State:</div> */}
@@ -272,8 +274,8 @@ function ActualHanabiLobby() {
                             </div>
                         </div> 
                     </div>
-                    <div className="bg-white p-2 w-[26rem]">
-                        <div className="font-bold">Transcript</div>
+                    <div className="bg-white p-2 w-[26rem] border-2 border-black">
+                        <div className="font-bold border-b-2 border-black">Transcript</div>
                         <div className="overflow-auto max-h-72">
                             {game.history.map((event) => (
                                 <div key={getKey()}>{event}</div>
