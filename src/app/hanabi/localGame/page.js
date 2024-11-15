@@ -25,7 +25,7 @@ function ActualHanabiLobby() {
     }
 
     // const {initGame, getGameState, playCard, getActivePlayer} = hanabiGame()
-    const [game, setGame] = useState(setInitGame)
+    const [game, setGame] = useState({})
     const [playerID, setPlayerID] = useState("P1")
     const [currentlySelectedCard, setCurrentlySelectedCard] = useState({
         setClicked: () => {},
@@ -49,6 +49,10 @@ function ActualHanabiLobby() {
           transcriptEnd.current.scrollIntoView({ behavior: 'smooth' });
         }
       });
+
+      useEffect(() =>{        
+        setGame(setInitGame())
+      }, [])
 
 
     
@@ -167,17 +171,18 @@ function ActualHanabiLobby() {
                     <div>
                         {/* {console.log(game)} */}
                         {/* <div>Game State:</div> */}
-                        <div className="mt-2">
+                        <div className="mt-2 ml-4">
                             <div className="mb-1">Tableau:</div>
-                            
-                            {Object.entries(game.tableau).map(([suit, card]) => (
-                                <Card 
-                                key={getKey()} 
-                                suit={card.suit} 
-                                value={card.value}
-                                notInteractable={true}
-                                ></Card>
-                            ))}
+                            <div className="mt-2 flex flex-row">
+                                {Object.entries(game.tableau).map(([suit, card]) => (
+                                    <Card 
+                                    key={getKey()} 
+                                    suit={card.suit} 
+                                    value={card.value}
+                                    notInteractable={true}
+                                    ></Card>
+                                ))}
+                            </div>
                         </div>
                         <div className="mt-2">
                             <span className="">Cards left: {game.deck.length}</span>
@@ -274,7 +279,7 @@ function ActualHanabiLobby() {
                             </div>
                         </div> 
                     </div>
-                    <div className="bg-white p-2 w-[26rem] border-2 border-black">
+                    <div className="bg-white p-2 m-2 w-[26rem] border-2 border-black">
                         <div className="font-bold border-b-2 border-black">Transcript</div>
                         <div className="overflow-auto max-h-72">
                             {game.history.map((event) => (

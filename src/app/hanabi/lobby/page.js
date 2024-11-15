@@ -54,9 +54,8 @@ export default function HanabiLobby() {
                 <div className="mt-4">
                     <Link href={"localGame"} className="rand-button mt-4 w-36 ">Restart Game</Link>
                 </div>
-                <div className="mt-10">
-                {/* const colors = ["Red", "Blue", "Green", "Yellow", "White"]
-                const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1} */}
+                
+                {/* <div className="mt-10">
                     {["Red", "Blue", "Green", "Yellow", "White"].map((color) =>(
                         <div key={color} className="flex flex-row">
                             {[1,2,3,4,5].map((num) => (
@@ -81,7 +80,7 @@ export default function HanabiLobby() {
                         className="hover:border-2 border-green-300 m-2"
                                         
                     ></Image>
-                </div>
+                </div> */}
             </div>
         </div>
     );
