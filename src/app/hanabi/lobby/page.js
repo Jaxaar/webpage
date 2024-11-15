@@ -73,6 +73,14 @@ export default function HanabiLobby() {
                             ))}
                         </div>
                     ))}
+                    <Image
+                        src={`/Cards/CardBack.png`} 
+                        width={100}
+                        height={1} 
+                        alt={`fireworks CB...`}
+                        className="hover:border-2 border-green-300 m-2"
+                                        
+                    ></Image>
                 </div>
             </div>
         </div>
