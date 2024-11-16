@@ -2,7 +2,7 @@ import { Card , castcardsToCards } from "./hanabiAPI";
 
 class LocalHanabiGame{
 
-    constructor(numPlayers = 4){
+    constructor(numPlayers = 4, printToConsole = false){
         this.numPlayers = numPlayers
         this.gameInitialized = false
         this.gameEnded = false
@@ -15,6 +15,9 @@ class LocalHanabiGame{
         this.hintsUsed = -1
         this.fuses = -1
 
+
+        this.printToConsole = printToConsole
+
         this.initGame()
     }
 
@@ -22,14 +25,14 @@ class LocalHanabiGame{
     //TODO: Fix general mess
     initGame () {
 
-        console.log("Initializing Game")
+        if(this.printToConsole) console.log("Initializing Game")
 
         // Build Deck & Tableau
         const colors = ["Red", "Blue", "Green", "Yellow", "White"]
         const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
         const decksObj = this.buildDecks(colors, numberPairs)
-        // console.log("Deck:")
-        // console.log(decksObj.deck)
+        // if(this.printToConsole) console.log("Deck:")
+        // if(this.printToConsole) console.log(decksObj.deck)
         this.deck = decksObj.deck
         this.tableau = decksObj.tableau
 
@@ -112,7 +115,7 @@ class LocalHanabiGame{
 
     // Index starts at 1 -> Cards in hand
     playCard(player, index){
-        // console.log(player)
+        // if(this.printToConsole) console.log(player)
         if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(player) == -1) || !(this.players?.[player].activePlayer) || this.players[player].hand.length < index || index < 1){
             return undefined
         }
@@ -136,7 +139,7 @@ class LocalHanabiGame{
         this.players[player].hand[index-1] = this.drawCard()
 
         const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
-        console.info(playStr)
+        if(this.printToConsole) console.info(playStr)
         this.history.push(playStr)
 
         this.checkGameOver()
@@ -162,7 +165,7 @@ class LocalHanabiGame{
         this.players[player].hand[index-1] = this.drawCard()
 
         const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
-        console.info(discStr)
+        if(this.printToConsole) console.info(discStr)
         this.history.push(discStr)
 
         this.checkGameOver()
@@ -190,7 +193,7 @@ class LocalHanabiGame{
         }
 
         const hintStr = `${turnPlayer}: Hints - "${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
-        console.info(hintStr)
+        if(this.printToConsole) console.info(hintStr)
         this.history.push(hintStr)
 
 
@@ -265,7 +268,7 @@ class LocalHanabiGame{
 
     gameOver(){
         const gameOverMessage = "Game Over! Score: " + this.scoreGame()
-        console.info("Game Over! Score: " + this.scoreGame())
+        if(this.printToConsole) console.info("Game Over! Score: " + this.scoreGame())
         this.history.push(gameOverMessage)
         this.gameEnded = true
         return true

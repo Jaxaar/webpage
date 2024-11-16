@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { hanabiGame } from "../../lib/hanabiAPI";
 import { useState } from "react";
-import "../HanabiUI/css/hanabiPage.css"
+import "../../ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
 import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
 import Image from "next/image";

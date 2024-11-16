@@ -33,6 +33,15 @@
     /* Darker shade of blue on hover */
 }
 
-.white-image{
-    filter: invert(99%) sepia(84%) saturate(2%) hue-rotate(20deg) brightness(110%) contrast(100%);
+.rand-button-unclickable{
+    padding: 10px 20px;
+    margin: 4px;
+    /* margin-top: 10px; */
+    /* margin-right: 8px; */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #9f9f9f;
+    /* Blue color for edit button */
 }

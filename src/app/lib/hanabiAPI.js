@@ -1,7 +1,5 @@
 import { LocalHanabiGame } from "./LocalHanabiGame"
 
-
-
 class Card {
     constructor(suit, value) {
         this.suit = suit
@@ -17,289 +15,6 @@ class Card {
     isPrevCard(otherCard){
         return (parseInt(this.value) + 1) == otherCard.value
     }
-}
-
-class HanabiAPI{
-
-    constructor(local, playerCount){
-        if(local){
-            this.game = new LocalHanabiGame()
-        }
-    }
-
-
-    getGameImage(player = null) {
-        if(player === null){
-            return this.game
-        }
-        const gameView = this.getGameDeepCopy()
-        const blankHand = []
-        for(let i = 1; i <= gameView.players[player].hand.length; i++){
-            blankHand.push(new Card("Card", i))
-        }
-        gameView.players[player].hand = blankHand
-        return gameView
-        return this.game
-    }
-
-    //TODO: Fix HORRIBLE function design to remove side-effects & general mess
-    initGame (numPlayers = 4) {
-        this.game = {
-            gameInitialized: false,
-            gameEnded: false,
-            players: {},
-            deck: [],
-            history: [],
-            discard: [],
-            tableau: {},
-            hints: -1,
-            hintsUsed: -1,
-            fuses: -1,
-        }
-
-        console.log("Initializing Game")
-        this.game.gameInitialized = false
-
-        // Build Deck & Tableau
-
-        const colors = ["Red", "Blue", "Green", "Yellow", "White"]
-        const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
-        const decksObj = this.buildDecks(colors, numberPairs)
-        // console.log("Deck:")
-        // console.log(decksObj.deck)
-        this.game.deck = decksObj.deck
-        this.game.tableau = decksObj.tableau
-
-        // Shuffle Deck
-        this.shuffleDeck()
-
-        // Init Markers
-        this.game.hints = 8
-        this.game.hintsUsed = 0
-        this.game.fuses = 3
-
-        // Deal
-        this.deal(numPlayers)
-
-        // Sets first player
-        this.game.players["P1"].activePlayer = true
-
-        // Sets Game Init Flag
-        this.game.gameInitialized = true
-    }
-
-    buildDecks(suits, valueCounts) {
-        let deck = []
-        let tableau = {}
-        for (const suit of suits){
-            tableau[suit] = (new Card(suit, 0))
-            for (const value in valueCounts){
-                for(let i = 0; i < valueCounts[value]; i++){
-                    deck.push(new Card(suit, value))
-                }
-            }
-        }
-        return {
-            deck: deck,
-            tableau: tableau
-        }
-    }
-
-    deal(numPlayers){
-        const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
-
-        const players = {}
-        for(let i = 1; i <= numPlayers; i++){
-            players["P" + i] = {"name": "P" + i}
-            players["P" + i].activePlayer = false
-            let hand = []
-            for(let j = 0; j < numPlayersToCardsDealt[numPlayers]; j++){
-                hand.push(this.game.deck.pop())
-            }
-            players["P" + i].hand = hand
-        }
-        this.game.players = players
-    }
-
-    shuffleDeck() {
-        this.game.deck = this.game.deck
-            .map(value => ({ value, sort: Math.random() }))
-            .sort((a, b) => a.sort - b.sort)
-            .map(({ value }) => value)
-    }
-
-    // TODO: Make Smoother / faster
-    advancePlayer(){
-        let arrPlayers = []
-        let activePlayer = ""
-        for(let [playerName, player] of Object.entries(this.game.players)){
-            arrPlayers.push(playerName)
-            if(player.activePlayer){
-                activePlayer = playerName
-                player.activePlayer = false
-            }
-        }
-        arrPlayers = arrPlayers.sort((a,b) => {
-            return parseInt(a.substring(1)) - parseInt(b.substring(1))
-        })
-
-        const inx = arrPlayers.indexOf(activePlayer)
-        if(inx+1 > arrPlayers.length - 1){
-            this.game.players[arrPlayers[0]].activePlayer = true
-            return this.game.players?.[arrPlayers[0]].name
-        } else{
-            this.game.players[arrPlayers[inx+1]].activePlayer = true
-            return this.game.players?.[arrPlayers[inx+1]].name
-        }
-    }
-
-    // Index starts at 1 -> Cards in hand
-    playCard(player, index){
-        // console.log(player)
-        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
-            return undefined
-        }
-        
-        const card = this.game.players[player].hand[index-1]
-
-        const successfulPlay = this.canPlayCard(card)
-        if(successfulPlay){
-            this.game.tableau[card.suit] = card
-
-            if(card.value === 5 && this.game.hintsUsed > 0){
-                this.game.hints = this.game.hints + 1
-                this.game.hintsUsed = this.game.hintsUsed - 1
-            }
-        }
-        else {
-            this.game.discard.push(card)
-            this.game.fuses = this.game.fuses - 1
-        }
-
-        this.game.players[player].hand[index-1] = this.drawCard()
-
-        const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discard."}`
-        console.info(playStr)
-        this.game.history.push(playStr)
-
-        this.checkGameOver()
-        this.advancePlayer()
-        return this.game.players[player].hand[index-1]
-    }
-
-    // Index starts at 1 -> Cards in hand
-    discardCard(player, index){
-        // console.log(player)
-        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(player) == -1) || !(this.game?.players?.[player].activePlayer) || this.game.players[player].hand.length < index || index < 1){
-            return undefined
-        }
-        
-        const card = this.game.players[player].hand[index-1]
-
-        this.game.discard.push(card)
-
-        if(this.game.hintsUsed > 0){
-            this.game.hints = this.game.hints + 1
-            this.game.hintsUsed = this.game.hintsUsed - 1
-        }
-
-        this.game.players[player].hand[index-1] = this.drawCard()
-
-        const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
-        console.info(discStr)
-        this.game.history.push(discStr)
-
-        this.checkGameOver()
-        this.advancePlayer()
-        return this.game.players[player].hand[index-1]
-    }
-
-    handleHint(turnPlayer, type, targetVal, targetPlayer){
-        if(this.game.hints < 1){
-            return undefined
-        }
-
-        if(!this.game.gameInitialized || this.game.gameOver || (Object.keys(this.game?.players).indexOf(turnPlayer) == -1) || !(this.game?.players?.[turnPlayer].activePlayer) || !this.game.players?.[targetPlayer]?.hand){
-            return undefined
-        }
-
-        let indexes = []
-        this.game?.players[targetPlayer]?.hand
-        for(let i = 0; i < this.game.players[targetPlayer].hand.length; i++){
-            const card = this.game.players[targetPlayer].hand[i]
-            if(type == "suit" && card.suit == targetVal){
-                indexes.push(i+1)
-            }
-            else if(type == "value" && card.value == targetVal){
-                indexes.push(i+1)
-            }
-        }
-
-        const hintStr = `${turnPlayer}: Hints - "${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
-        console.info(hintStr)
-        this.game.history.push(hintStr)
-
-
-        this.game.hints = this.game.hints - 1
-        this.game.hintsUsed = this.game.hintsUsed + 1
-
-        this.checkGameOver()
-        this.advancePlayer()
-    }
-
-    canPlayCard(card){
-        return this.game.tableau?.[card.suit].isPrevCard(card)
-    }
-
-    drawCard(){
-        return this.game.deck.pop()
-    }
-
-    getActivePlayer(){
-        for(let [playerName, player] of Object.entries(this.game.players)){
-            if(player.activePlayer){
-                return playerName
-            }
-        }
-    }
-
-    checkGameOver(){
-        if(this.game.fuses < 1 || this.game.deck.length < 1){
-            this.gameOver()
-        }
-        let all5s = true
-        for(let [suit, card] of Object.entries(this.game.tableau)){
-            if(card.value !== 5){
-                all5s = false
-            }
-        }
-        if(all5s){
-            this.gameOver()
-        }
-    }
-
-    gameOver(){
-        const gameOverMessage = "Game Over! Score: " + this.scoreGame()
-        console.info("Game Over! Score: " + this.scoreGame())
-        this.game.history.push(gameOverMessage)
-        this.game.gameEnded = true
-    }
-
-    scoreGame(){
-        let sum = 0;
-
-        for(let [suit, card] of Object.entries(this.game.tableau)){
-            sum += parseInt(card.value)
-        }
-        return sum
-    }
-
-    // return {
-    //     initGame: initGame,
-    //     getGameState: getGameState,
-    //     playCard, playCard,
-    //     getActivePlayer, getActivePlayer,
-    // };
 }
 
 function castcardsToCards(gameImage){
@@ -326,4 +41,103 @@ function makeGameFromJSON(game){
     return castcardsToCards(JSON.parse(game))
 }
 
-export {HanabiAPI, Card, castcardsToCards, makeGameFromJSON}
+class HanabiAPI{
+
+    constructor(){
+        this.game = undefined
+    }
+
+    startGame(local, playerCount, printToConsole){
+        if(local){
+            this.game = new LocalHanabiGame(playerCount, printToConsole)
+        }
+        else{
+            console.log("Failed. Not Local??")
+        }
+    }
+
+    getGameImage(player = null) {
+        if(player === null){
+            return this.game.getGameImage()
+        }
+        return this.game.getGameImage(player)
+    }
+
+    // advancePlayer(){
+    //     this.game.advancePlayer()
+    // }
+
+    // Index starts at 1 -> Cards in hand
+    playCard(player, index){
+        // console.log(player)
+        return this.game.playCard(player, index)
+    }
+
+    // Index starts at 1 -> Cards in hand
+    discardCard(player, index){
+        
+        return this.game.discardCard(player, index)
+    }
+
+    handleHint(turnPlayer, type, targetVal, targetPlayer){
+        return this.game.handleHint(turnPlayer, type, targetVal, targetPlayer)
+    }
+
+    getActivePlayer(){
+        return this.game.getActivePlayer()
+    }
+
+    checkGameOver(){
+        return this.game.checkGameOver()
+    }
+
+    scoreGame(){
+        return this.game.scoreGame()
+    }
+}
+
+function runSingleGame(arrOfPlayers, showINFO){
+
+    const game = new HanabiAPI()
+    game.startGame(true, arrOfPlayers.length, showINFO)
+    while(!game.checkGameOver()){
+        const curPlayerStr = game.getActivePlayer()
+        const curPlayer = arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
+        console.log(curPlayerStr)
+        const rawAction = curPlayer.getAction(game.getGameImage(curPlayerStr))
+        if(rawAction == null){
+            console.log("nope")
+            console.log(game)
+            return -1
+        }
+
+
+        const action = rawAction.split("-")
+
+        // Format: Hint-P#-Type-value  - where p# is the target player Id, Type is Suit or Value, and value is the actual value (color/number) of the clue
+        if(action[0] === "Hint" && action.length === 4){
+            game.handleHint(curPlayerStr, action[2], action[3], action[1])
+        }
+        // Format: Play-#: where # is the index and a num 1-handLimit
+        else if(action[0] ==="Play" && action.length === 2){
+            game.playCard(curPlayerStr, action[1])
+        }
+        // Format: Discard-#: where # is the index and a num 1-handLimit
+        else if(action[0] === "Discard" && action.length === 2){
+            game.discardCard(curPlayerStr, action[1])
+        }
+        else{
+            console.log("Uh Oh... Something broke")
+            console.log(game)
+            console.log(curPlayerStr)
+            console.log(action)
+            return -1
+        }
+    }
+    console.log(game.game.history)
+    return game.scoreGame()
+}
+
+
+
+export {HanabiAPI, Card, castcardsToCards, makeGameFromJSON, runSingleGame}
