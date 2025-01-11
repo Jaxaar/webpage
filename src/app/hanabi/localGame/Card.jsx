@@ -27,7 +27,7 @@ export default function Card({suit, value, player, canSee, cardSelected, index, 
                 <span>
                     {notInteractable &&
                         <Image
-                        src={`./Cards/${value === 0 ? "Blank" : suit}-${value}.png`} 
+                        src={`/webpage/Cards/${value === 0 ? "Blank" : suit}-${value}.png`} 
                         width={80}
                         height={1} 
                         alt={`fireworks ${suit}-${value}`}
@@ -35,7 +35,7 @@ export default function Card({suit, value, player, canSee, cardSelected, index, 
                         ></Image>
                     ||
                         <Image
-                            src={`/Cards/${suit === "Card" ? "CardBack" : suit}${suit !== "Card" ? `-${value}` : ""}.png`} 
+                            src={`/webpage/Cards/${suit === "Card" ? "CardBack" : suit}${suit !== "Card" ? `-${value}` : ""}.png`} 
                             width={80}
                             height={1} 
                             alt={`fireworks ${suit}-${value}`}
