@@ -1,0 +1,50 @@
+
+
+AI Object:
+
+- DB
+
+() => GetAction - What move would the AI make in this circumstance
+    - Requires GameState
+
+AI DB:
+
+Facts:
+- What I know about my hand
+- What my partners know about their hands
+- What I can see in the discard / Tableau
+- What I can see in my partners' hands
+
+Inferences:
+- What do I know about my hand based on what I can see
+- What do my partner's know about their hands based on what I can see / I know about my hand
+- What are my partner's plays
+- What are my plays
+
+
+
+AI Logic:
+
+- If there are hint tokens and my partner needs information, give it
+    - How do I know my partner has a move?
+- If I have a card I can play safely, Play it
+- If I have a card, I think I should play, Play it
+    - What does that mean?
+- If I had a card I can discard safely, discard it
+- If I don't have a safe discard, can I give useful (Play or Save hints) information
+- Discard chopping block
+
+
+Simple Logic:
+
+- Are there hint tokens and I can give new useful (Play or Save hints) information
+- If I have a card I can play safely, Play it
+- If I have a card, I think I should play, Play it
+    - What does that mean?
+- If I had a card I can discard safely, discard it
+- Discard chopping block
+
+
+
+
+

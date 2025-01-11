@@ -1,6 +1,7 @@
 'use client'
 import Link from "next/link";
 import { HanabiAPI, runSingleGame } from "../../lib/hanabiAPI";
+import { HanabiDBAI } from "@/app/lib/hanabiAI";
 import { useState } from "react";
 import "../../ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
@@ -23,7 +24,7 @@ export default function HanabiAIPage() {
         }
 
         console.log(`Starting ${numGames} game(s) with ${numPlayers}`)
-        setButtonsClickable(false)
+        // setButtonsClickable(false)
         runGames()
     }
 
@@ -45,7 +46,7 @@ export default function HanabiAIPage() {
                 return userInput
             }
         }
-        const score = runSingleGame([playerMove, playerMove], true)
+        const score = runSingleGame([new HanabiDBAI(), new HanabiDBAI()], true)
         return score
     }
 

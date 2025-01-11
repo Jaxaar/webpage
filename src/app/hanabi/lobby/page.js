@@ -42,7 +42,7 @@ export default function HanabiLobby() {
                 </div>
                 <div>
                     <span>Number of players: </span>
-                    <input type="text" name="numPlayers" placeholder="" className="border-2 p-1" onChange={(event) => setNumPlayers(event.target.value)}></input>
+                    <input type="text" name="numPlayers" placeholder="2-5" className="border-2 p-1" onChange={(event) => setNumPlayers(event.target.value)}></input>
                 </div>
                 <div>
                     <span>Use Spoiler Wall: </span>

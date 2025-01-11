@@ -9,5 +9,9 @@ const colorDict = {
     "Card": "text-black"
 }
 
+const Suits = ["Red", "Blue", "Green", "Yellow", "White"]
+const Values = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
 
-export {colorDict}
+
+
+export {colorDict, Suits, Values}

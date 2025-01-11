@@ -1,4 +1,5 @@
-import { Card , castcardsToCards } from "./hanabiAPI";
+import { Card , castcardsToCards, makeGameFromJSON } from "./hanabiAPI";
+import { Suits, Values} from "./hanabiConsts";
 
 class LocalHanabiGame{
 
@@ -28,9 +29,7 @@ class LocalHanabiGame{
         if(this.printToConsole) console.log("Initializing Game")
 
         // Build Deck & Tableau
-        const colors = ["Red", "Blue", "Green", "Yellow", "White"]
-        const numberPairs = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
-        const decksObj = this.buildDecks(colors, numberPairs)
+        const decksObj = this.buildDecks(Suits, Values)
         // if(this.printToConsole) console.log("Deck:")
         // if(this.printToConsole) console.log(decksObj.deck)
         this.deck = decksObj.deck
@@ -97,7 +96,7 @@ class LocalHanabiGame{
 
     // TODO: Make more efficient
     getGameDeepCopy () {
-        return castcardsToCards(JSON.parse(JSON.stringify(this)))
+        return makeGameFromJSON(JSON.stringify(this))
     }
 
     getGameImage(player = null) {
@@ -192,7 +191,7 @@ class LocalHanabiGame{
             }
         }
 
-        const hintStr = `${turnPlayer}: Hints - "${targetPlayer}: The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
+        const hintStr = `${turnPlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
         if(this.printToConsole) console.info(hintStr)
         this.history.push(hintStr)
 

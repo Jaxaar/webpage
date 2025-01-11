@@ -15,6 +15,13 @@ class Card {
     isPrevCard(otherCard){
         return (parseInt(this.value) + 1) == otherCard.value
     }
+    isAfterCard(otherCard){
+        return (parseInt(this.value)) > otherCard.value
+    }
+    equals(otherCard){
+        return this.suit === otherCard?.suit && this.suit === otherCard?.suit
+    }
+
 }
 
 function castcardsToCards(gameImage){
@@ -30,6 +37,13 @@ function castcardsToCards(gameImage){
         newTab[suit] = makeCard(card)
     }
     gameImage.tableau = newTab
+
+    const deck = []
+    for(let c of gameImage.deck){
+        deck.push(makeCard(c))
+    }
+    gameImage.deck = deck
+    
     return gameImage
 }
 
@@ -38,7 +52,7 @@ function makeCard(card){
 }
 
 function makeGameFromJSON(game){
-    return castcardsToCards(JSON.parse(game))
+    return Object.assign(new LocalHanabiGame, castcardsToCards(JSON.parse(game)))
 }
 
 class HanabiAPI{
