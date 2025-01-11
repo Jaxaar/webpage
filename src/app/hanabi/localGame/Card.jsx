@@ -27,7 +27,7 @@ export default function Card({suit, value, player, canSee, cardSelected, index, 
                 <span>
                     {notInteractable &&
                         <Image
-                        src={`/Cards/${value === 0 ? "Blank" : suit}-${value}.png`} 
+                        src={`./Cards/${value === 0 ? "Blank" : suit}-${value}.png`} 
                         width={80}
                         height={1} 
                         alt={`fireworks ${suit}-${value}`}
