@@ -42,7 +42,7 @@ class HanabiDBAI{
     }
 
     assimilateRound(history){
-        this.kb.assimilateRound(history)
+        this.kb.assimilateHistory(history)
     }
 
     determinePlay(gameImage){
@@ -97,104 +97,47 @@ class KnowledgeDatabase{
         }
     }
 
-    assimilateRound(history){
+    assimilateHistory(history){
         console.log("Handle History")
-        for(let str of history){
+        for(let obj of history){
 
-            const colonSplit = str.split(": ")
-            const player = colonSplit[0]
-            console.log(player)
-            console.log(colonSplit)
-            if(colonSplit?.[1] == undefined){
-                console.log("History Err, invalid string")
-                continue
-            }
+            console.log(obj)
 
-            const spaceSplit = colonSplit[1].split(" ")
-            console.log(spaceSplit)
-
-            if(spaceSplit[0] === "Hints"){
+            if(obj.typeOfMove === "hint"){
                 console.log("Hint")
 
             }
-            else if(spaceSplit[0] === "Plays"){
+            else if(obj.typeOfMove === "play"){
                 console.log("Play")
-                const cardIndex = parseInt(spaceSplit[3])
-                
-                const card = new Card(spaceSplit[6], parseInt(spaceSplit[7]))
 
-                // if(str.includes("Success!")){
+                if(obj.successfulPlay.includes("Success!")){
 
-                // }
-                // else{
-
-                // }
-
-                if(player !== this.playerId){
-                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(card)), 1)
                 }
-                this.cardsVisibleToEveryone.push(card)
+                else{
+
+                }
+
+                if(obj.sourcePlayer !== this.playerId){
+                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(obj.card)), 1)
+                }
+                this.cardsVisibleToEveryone.push(obj.card)
 
                 // Clear player knowledge
 
             }
-            else if(spaceSplit[0] === "Discards"){
+            else if(obj.typeOfMove === "discard"){
                 console.log("Discard")
-                const cardIndex = parseInt(spaceSplit[3])
-                const card = new Card(spaceSplit[6], parseInt(spaceSplit[7]))
 
-                if(player !== this.playerId){
-                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(card)), 1)
+                if(obj.sourcePlayer !== this.playerId){
+                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(obj.card)), 1)
                 }
-                this.cardsVisibleToEveryone.push(card)
+                this.cardsVisibleToEveryone.push(obj.card)
                 
                 // Clear player knowledge
             }
         }
 
     }
-
-// :
-// "P1: Hints - "P2: The cards 2 are 1's"."
-// 1
-// :
-// "P2: Plays their 2 card, a Blue 1. Success!"
-// 2
-// :
-// "P1: Hints "P2 - The cards 2 are 1's"."
-// 3
-// :
-// "P2: Plays their 2 card, a Yellow 1. Success!"
-// 4
-// :
-// "P1: Plays their 3 card, a Blue 5. Failed and discarded."
-// 5
-// :
-// "P2: Discards their 2 card, a Red 4."
-// 6
-// :
-// "P1: Hints "P2 - The cards 1,2 are Yellow"."
-// 7
-// :
-// "P2: Hints "P1 - The cards 2,4 are 2's"."
-// 8
-// :
-// "P1: Discards their 4 card, a Red 2."
-// 9
-// :
-// "P2: Hints - "P1: The cards 2,4 are 2's"."
-// 10
-// :
-// "P1: Plays their 4 card, a Blue 2. Success!"
-// 11
-// :
-// "P2: Plays their 3 card, a Blue 3. Success!"
-// 12
-// :
-// "P1: Hints - "P2: The cards 1,2 are Yellow"."
-// 13
-// :
-// "P2: Discards their 1 card, a Yellow 3."
 
     getAllCards(){
         const deck = []

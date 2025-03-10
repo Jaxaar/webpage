@@ -137,9 +137,10 @@ class LocalHanabiGame{
 
         this.players[player].hand[index-1] = this.drawCard()
 
-        const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
-        if(this.printToConsole) console.info(playStr)
-        this.history.push(playStr)
+        const playObj = new HanabiMovePlay(player, index, card, successfulPlay)
+        // const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
+        if(this.printToConsole) console.info(playObj)
+        this.history.push(playObj)
 
         this.checkGameOver()
         this.advancePlayer()
@@ -163,20 +164,21 @@ class LocalHanabiGame{
 
         this.players[player].hand[index-1] = this.drawCard()
 
-        const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
-        if(this.printToConsole) console.info(discStr)
-        this.history.push(discStr)
+        const discObj = new HanabiMoveDiscard(player, index, card)
+        // const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
+        if(this.printToConsole) console.info(discObj)
+        this.history.push(discObj)
 
         this.checkGameOver()
         this.advancePlayer()
         return this.players[player].hand[index-1]
     }
 
-    handleHint(turnPlayer, type, targetVal, targetPlayer){
+    handleHint(sourcePlayer, type, targetVal, targetPlayer){
         if(this.hints < 1){
             return undefined
         }
-        if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(turnPlayer) == -1) || !(this.players?.[turnPlayer].activePlayer) || !this.players?.[targetPlayer]?.hand){
+        if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(sourcePlayer) == -1) || !(this.players?.[sourcePlayer].activePlayer) || !this.players?.[targetPlayer]?.hand){
             return undefined
         }
 
@@ -191,9 +193,10 @@ class LocalHanabiGame{
             }
         }
 
-        const hintStr = `${turnPlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
-        if(this.printToConsole) console.info(hintStr)
-        this.history.push(hintStr)
+        const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes)
+        // const hintStr = `${sourcePlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
+        if(this.printToConsole) console.info(hintObj)
+        this.history.push(hintObj)
 
 
         this.hints = this.hints - 1
@@ -201,12 +204,15 @@ class LocalHanabiGame{
 
         this.checkGameOver()
         this.advancePlayer()
-        return hintStr
+        return hintObj
     }
 
     
     // TODO: Make Smoother / faster
     advancePlayer(){
+        console.log(this.history)
+        console.log(this.history.map((x) => x.toString()))
+
         let arrPlayers = []
         let activePlayer = ""
         for(let [playerName, player] of Object.entries(this.players)){
@@ -286,5 +292,109 @@ class LocalHanabiGame{
         return JSON.stringify(this)
     }
 }
+
+/**
+ * @abstract
+ */
+class HanabiMove{
+    constructor(typeOfMove, sourcePlayer){
+        this.typeOfMove = typeOfMove
+        this.sourcePlayer = sourcePlayer
+    }
+
+    toString(){
+        return `${this.sourcePlayer} ${this.typeOfMove}s`
+    }
+}
+
+class HanabiMovePlay extends HanabiMove{
+    constructor(sourcePlayer, targetCardIndex, card, successfulPlay){
+        super("play", sourcePlayer)
+        this.targetCardIndex = targetCardIndex
+        this.card = card
+        this.successfulPlay = successfulPlay
+    }
+
+    toString(){
+        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numSuffix[this.targetCardIndex]} card, a ${this.card.toString()}. ${this.successfulPlay ? "Success!" : "Failed and discarded."}`
+    }
+}
+
+class HanabiMoveDiscard extends HanabiMove{
+    constructor(sourcePlayer, targetCardIndex, card){
+        super("discard", sourcePlayer)
+        this.targetCardIndex = targetCardIndex
+        this.card = card
+    }
+
+    toString(){
+        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numSuffix[this.targetCardIndex]} card, a ${this.card.toString()}.`
+    }
+}
+
+class HanabiMoveHint extends HanabiMove{
+    constructor(sourcePlayer, targetPlayer, hintType, hintValue, targetCardIndices){
+        super("hint", sourcePlayer)
+        this.targetPlayer = targetPlayer
+        this.hintType = hintType
+        this.hintValue = hintValue
+        this.targetCardIndices = targetCardIndices
+    }
+
+    toString(){
+        return `${this.sourcePlayer} ${this.typeOfMove}s - "${this.targetPlayer}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is"} ${this.hintValue}s`
+    }
+}
+
+const numSuffix = {
+    1: "st",
+    2: "nd",
+    3: "rd",
+    4: "th",
+    5: "th"
+}
+
+
+// :
+// "P1: Hints - "P2: The cards 2 are 1's"."
+// 1
+// :
+// "P2: Plays their 2 card, a Blue 1. Success!"
+// 2
+// :
+// "P1: Hints "P2 - The cards 2 are 1's"."
+// 3
+// :
+// "P2: Plays their 2 card, a Yellow 1. Success!"
+// 4
+// :
+// "P1: Plays their 3 card, a Blue 5. Failed and discarded."
+// 5
+// :
+// "P2: Discards their 2 card, a Red 4."
+// 6
+// :
+// "P1: Hints "P2 - The cards 1,2 are Yellow"."
+// 7
+// :
+// "P2: Hints "P1 - The cards 2,4 are 2's"."
+// 8
+// :
+// "P1: Discards their 4 card, a Red 2."
+// 9
+// :
+// "P2: Hints - "P1: The cards 2,4 are 2's"."
+// 10
+// :
+// "P1: Plays their 4 card, a Blue 2. Success!"
+// 11
+// :
+// "P2: Plays their 3 card, a Blue 3. Success!"
+// 12
+// :
+// "P1: Hints - "P2: The cards 1,2 are Yellow"."
+// 13
+// :
+// "P2: Discards their 1 card, a Yellow 3."
 
 export {LocalHanabiGame}

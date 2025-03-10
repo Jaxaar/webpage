@@ -1,0 +1,22 @@
+Todo:
+Finish Working AI & AI testing page
+Add AI to actual game
+Improve Lobby page
+
+
+
+
+
+Plans:
+Add enhanced hint mechanism (Highlighted cards somehow)
+Add Server-hosted multiplayer
+
+Add no-memory mode
+Add rearranging hand
+Update game page
+COLORS
+
+
+
+
+

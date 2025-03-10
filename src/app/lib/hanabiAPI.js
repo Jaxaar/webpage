@@ -147,8 +147,8 @@ function runSingleGame(arrOfPlayers, showINFO){
             console.log(action)
             return -1
         }
+        console.log(game.game.history)
     }
-    console.log(game.game.history)
     return game.scoreGame()
 }
 

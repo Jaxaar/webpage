@@ -282,7 +282,7 @@ function ActualHanabiLobby() {
                     <div className="bg-white p-2 m-2 w-[26rem] border-2 border-black">
                         <div className="font-bold border-b-2 border-black">Transcript</div>
                         <div className="overflow-auto max-h-72">
-                            {game.history.map((event) => (
+                            {game.history.map((x) => x.toString()).map((event) => (
                                 <div key={getKey()}>{event}</div>
                             ))}
                             <div ref={transcriptEnd}></div>
