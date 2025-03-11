@@ -19,7 +19,7 @@ class Card {
         return (parseInt(this.value)) > otherCard.value
     }
     equals(otherCard){
-        return this.suit === otherCard?.suit && this.suit === otherCard?.suit
+        return (this.suit === otherCard?.suit && this.value === otherCard?.value)
     }
 
 }
@@ -114,10 +114,11 @@ function runSingleGame(arrOfPlayers, showINFO){
 
     const game = new HanabiAPI()
     game.startGame(true, arrOfPlayers.length, showINFO)
+    // game.startGame(true, arrOfPlayers.length, false)
     while(!game.checkGameOver()){
         const curPlayerStr = game.getActivePlayer()
         const curPlayer = arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-        console.log(curPlayerStr)
+        console.log(`Player ${curPlayerStr}'s Turn`)
         const rawAction = curPlayer.getAction(game.getGameImage(curPlayerStr))
         if(rawAction == null){
             console.log("nope")
@@ -147,7 +148,7 @@ function runSingleGame(arrOfPlayers, showINFO){
             console.log(action)
             return -1
         }
-        console.log(game.game.history)
+        console.log(game.game.history.map((x) => x.toString()))
     }
     return game.scoreGame()
 }

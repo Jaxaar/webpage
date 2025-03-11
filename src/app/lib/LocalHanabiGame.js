@@ -139,7 +139,7 @@ class LocalHanabiGame{
 
         const playObj = new HanabiMovePlay(player, index, card, successfulPlay)
         // const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
-        if(this.printToConsole) console.info(playObj)
+        if(this.printToConsole) console.info(playObj.toString())
         this.history.push(playObj)
 
         this.checkGameOver()
@@ -166,7 +166,7 @@ class LocalHanabiGame{
 
         const discObj = new HanabiMoveDiscard(player, index, card)
         // const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
-        if(this.printToConsole) console.info(discObj)
+        if(this.printToConsole) console.info(discObj.toString())
         this.history.push(discObj)
 
         this.checkGameOver()
@@ -195,7 +195,7 @@ class LocalHanabiGame{
 
         const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes)
         // const hintStr = `${sourcePlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
-        if(this.printToConsole) console.info(hintObj)
+        if(this.printToConsole) console.info(hintObj.toString())
         this.history.push(hintObj)
 
 
@@ -210,9 +210,6 @@ class LocalHanabiGame{
     
     // TODO: Make Smoother / faster
     advancePlayer(){
-        console.log(this.history)
-        console.log(this.history.map((x) => x.toString()))
-
         let arrPlayers = []
         let activePlayer = ""
         for(let [playerName, player] of Object.entries(this.players)){

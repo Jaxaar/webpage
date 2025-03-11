@@ -64,9 +64,12 @@ class KnowledgeDatabase{
     }
 
     initDB(gameImage){
+        console.log("Initializing DB")
         this.playerId = gameImage.getActivePlayer()
 
+
         // Set cardsVisibleToEveryone
+        // Can probably remove once history is working
         for(let c of gameImage.discard){
             this.cardsVisibleToEveryone.push(c)
         }
@@ -74,10 +77,14 @@ class KnowledgeDatabase{
             if(c.value !== 0) this.cardsVisibleToEveryone.push(c)
         }
 
+
+
         this.cardsUnseen = this.getAllCards()
         for(let c of this.cardsVisibleToEveryone){
-            this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)))
+            console.log(c)
+            this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
         }
+
         for(let [pkey, p] of Object.entries(gameImage.players)){
             if(pkey !== this.playerId){
                 for(let c of p.hand){
