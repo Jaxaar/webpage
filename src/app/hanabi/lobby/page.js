@@ -10,12 +10,20 @@ import Image from "next/image";
 
 export default function HanabiLobby() {
 
-    const [numPlayers, setNumPlayers] = useState(-1)
+    // const [numPlayers, setNumPlayers] = useState(-1)
+    const [numPlayers, setNumPlayers] = useState(2)
+
 
 
     function onStartButtonPress(){
         if(buildLocalGame()){
             redirect("localGame", RedirectType.push)
+        }
+    }
+
+    function onStartv2ButtonPress(){
+        if(buildLocalGame()){
+            redirect("localGamev2", RedirectType.push)
         }
     }
 
@@ -25,8 +33,14 @@ export default function HanabiLobby() {
             return false
         }
 
-        const game = new LocalHanabiGame(numPlayers)
+        const game = new LocalHanabiGame(numPlayers, true)
         sessionStorage.setItem("CurLocalHanabiGame", game.toString())
+
+        const hanabiMetaData = {
+            numPlayers: numPlayers,
+            spoilerWall: false,
+        }
+        sessionStorage.setItem("LoadingHanabiGameMetaData", JSON.stringify(hanabiMetaData))
         console.log("game built")
         return true
     }
@@ -50,6 +64,9 @@ export default function HanabiLobby() {
                 </div>
                 <div onClick={onStartButtonPress} className="rand-button mt-4 w-32">
                     Start Game
+                </div>
+                <div onClick={onStartv2ButtonPress} className="rand-button mt-4 w-32">
+                    Start Game V2.
                 </div>
                 <div className="mt-4">
                     <Link href={"localGame"} className="rand-button mt-4 w-36 ">Restart Game</Link>

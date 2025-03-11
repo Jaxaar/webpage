@@ -52,7 +52,9 @@ function makeCard(card){
 }
 
 function makeGameFromJSON(game){
-    return Object.assign(new LocalHanabiGame, castcardsToCards(JSON.parse(game)))
+    const imageWithCards = castcardsToCards(JSON.parse(game))
+
+    return Object.assign(new LocalHanabiGame, imageWithCards)
 }
 
 class HanabiAPI{
@@ -118,7 +120,7 @@ function runSingleGame(arrOfPlayers, showINFO){
     while(!game.checkGameOver()){
         const curPlayerStr = game.getActivePlayer()
         const curPlayer = arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-        console.log(`Player ${curPlayerStr}'s Turn`)
+        console.log(`Player ${curPlayerStr}'s Turn -----------------------------------`)
         const rawAction = curPlayer.getAction(game.getGameImage(curPlayerStr))
         if(rawAction == null){
             console.log("nope")

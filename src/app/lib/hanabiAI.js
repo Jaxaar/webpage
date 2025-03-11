@@ -26,7 +26,7 @@ class HanabiDBAI{
         // console.log(gameImage)
         this.initKB(gameImage)
         console.log(this.kb)
-        this.assimilateRound(gameImage.history)
+        // this.assimilateRound(gameImage.history)
 
         return this.determinePlay(gameImage)
 
@@ -42,7 +42,7 @@ class HanabiDBAI{
     }
 
     assimilateRound(history){
-        this.kb.assimilateHistory(history)
+        this.kb.assimilateRound(history)
     }
 
     determinePlay(gameImage){
@@ -68,23 +68,10 @@ class KnowledgeDatabase{
         this.playerId = gameImage.getActivePlayer()
 
 
-        // Set cardsVisibleToEveryone
-        // Can probably remove once history is working
-        for(let c of gameImage.discard){
-            this.cardsVisibleToEveryone.push(c)
-        }
-        for(let [suit, c] of Object.entries(gameImage.tableau)){
-            if(c.value !== 0) this.cardsVisibleToEveryone.push(c)
-        }
-
-
-
+        // Set Cards which aren't seen to all
         this.cardsUnseen = this.getAllCards()
-        for(let c of this.cardsVisibleToEveryone){
-            console.log(c)
-            this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
-        }
 
+        // Remove the cards which the other players have
         for(let [pkey, p] of Object.entries(gameImage.players)){
             if(pkey !== this.playerId){
                 for(let c of p.hand){
@@ -96,6 +83,26 @@ class KnowledgeDatabase{
             }
         }
 
+
+        // if(!this.reloadEveryTurn){
+        //     // Set cardsVisibleToEveryone (none at the start of the game)
+        //     for(let c of gameImage.discard){
+        //         this.cardsVisibleToEveryone.push(c)
+        //     }
+        //     for(let [suit, c] of Object.entries(gameImage.tableau)){
+        //         if(c.value !== 0) this.cardsVisibleToEveryone.push(c)
+        //     }
+
+        //     // Remove cards everyone can see from the unseen array
+        //     for(let c of this.cardsVisibleToEveryone){
+        //         this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
+        //     }
+        // }
+
+        // Only for testing. Practically the db must be initialized raw at the start of each game not turn to work right
+        this.assimilateHistory(gameImage.history)
+
+        // Init blank knowledge for each player
         for(let [pkey, p] of Object.entries(gameImage.players)){
             this.knowledgeOfHands[pkey] = []
             for(let c of p.hand){
@@ -107,43 +114,57 @@ class KnowledgeDatabase{
     assimilateHistory(history){
         console.log("Handle History")
         for(let obj of history){
+            this.readHistoryEvent(obj)
+        }
+    }
 
-            console.log(obj)
-
-            if(obj.typeOfMove === "hint"){
-                console.log("Hint")
-
-            }
-            else if(obj.typeOfMove === "play"){
-                console.log("Play")
-
-                if(obj.successfulPlay.includes("Success!")){
-
-                }
-                else{
-
-                }
-
-                if(obj.sourcePlayer !== this.playerId){
-                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(obj.card)), 1)
-                }
-                this.cardsVisibleToEveryone.push(obj.card)
-
-                // Clear player knowledge
-
-            }
-            else if(obj.typeOfMove === "discard"){
-                console.log("Discard")
-
-                if(obj.sourcePlayer !== this.playerId){
-                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(obj.card)), 1)
-                }
-                this.cardsVisibleToEveryone.push(obj.card)
-                
-                // Clear player knowledge
+    assimilateRound(history){
+        console.log("Handle Round")
+        for(let obj of history){
+            const t = this.readHistoryEvent(obj)
+            if(t === "hint" || t === "play" || t === "discard"){
+                return t
             }
         }
+    }
 
+    readHistoryEvent(histObj){
+        console.log(histObj)
+
+        if(histObj.typeOfMove === "hint"){
+            console.log("Hint")
+
+        }
+        else if(histObj.typeOfMove === "play"){
+            console.log("Play")
+
+            if(histObj.successfulPlay){
+
+            }
+            else{
+
+            }
+
+            if(histObj.sourcePlayer !== this.playerId){
+                this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1)
+            }
+            this.cardsVisibleToEveryone.push(histObj.card)
+
+            // Clear player knowledge
+
+        }
+        else if(histObj.typeOfMove === "discard"){
+            // console.log("Discard")
+
+            if(histObj.sourcePlayer !== this.playerId){
+                console.log("Split")
+                console.log(this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1))
+            }
+            this.cardsVisibleToEveryone.push(histObj.card)
+            
+            // Clear player knowledge
+        }
+        return histObj.typeOfMove
     }
 
     getAllCards(){

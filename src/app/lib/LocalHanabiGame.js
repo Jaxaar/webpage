@@ -96,7 +96,9 @@ class LocalHanabiGame{
 
     // TODO: Make more efficient
     getGameDeepCopy () {
-        return makeGameFromJSON(JSON.stringify(this))
+        const image = makeGameFromJSON(JSON.stringify(this))
+        image.history = image.history.map((x) => convertObjectToHanabiMove(x))
+        return image
     }
 
     getGameImage(player = null) {
@@ -290,6 +292,19 @@ class LocalHanabiGame{
     }
 }
 
+function convertObjectToHanabiMove(x){
+    x.card = Object.assign(new Card, x.card)
+    if(x.typeOfMove === "hint"){
+        return Object.assign(new HanabiMoveHint, x)
+    }
+    else if(x.typeOfMove === "discard"){
+        return Object.assign(new HanabiMoveDiscard, x)
+    }
+    else if(x.typeOfMove === "play"){
+        return Object.assign(new HanabiMovePlay, x)
+    }
+}
+
 /**
  * @abstract
  */
@@ -339,7 +354,7 @@ class HanabiMoveHint extends HanabiMove{
     }
 
     toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s - "${this.targetPlayer}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is"} ${this.hintValue}s`
+        return `${this.sourcePlayer} ${this.typeOfMove}s - "${this.targetPlayer}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue} ${this.targetCardIndices.length > 1 ? "s" : ""}`
     }
 }
 
@@ -394,4 +409,4 @@ const numSuffix = {
 // :
 // "P2: Discards their 1 card, a Yellow 3."
 
-export {LocalHanabiGame}
+export {LocalHanabiGame, HanabiMove}
