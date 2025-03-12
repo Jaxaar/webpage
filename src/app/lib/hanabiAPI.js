@@ -53,4 +53,4 @@ function runSingleGame(arrOfPlayers, showINFO){
 
 
 
-export {HanabiAPI, runSingleGame}
+export {runSingleGame}
