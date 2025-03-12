@@ -21,8 +21,8 @@ class HanabiController {
         return this.game.getActivePlayer()
     }
 
-    getGameImage() {
-        return this.game.getGameImage(this.getThisPlayer())
+    getGameImage(player = this.getThisPlayer()) {
+        return this.game.getGameImage(player)
     }
 
     // Index starts at 1 -> Cards in hand
@@ -83,10 +83,14 @@ class HanabiControllerMultiplayer extends HanabiController{
         super(new LocalHanabiGame(playerCount, printToConsole))
         this.waitingForPlayer = true
         this.arrOfPlayers = players
+        for(const p of players){
+            p.init(this)
+        }
         // this.player = "P1"
         this.runGame()
     }
 
+    // Update to show the active play If human otherwise the most recent active
     /**
      * @override
      * @returns the active player since it's local
@@ -100,7 +104,7 @@ class HanabiControllerMultiplayer extends HanabiController{
         while(!this.checkGameOver()){
             const curPlayerStr = this.getActivePlayer()
             const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-            console.log(`Player ${curPlayerStr}'s Turn -----------------------------------`)
+            console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
             // console.log(action)
             // console.log(this)

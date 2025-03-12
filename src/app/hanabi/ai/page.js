@@ -48,7 +48,7 @@ export default function HanabiAIPage() {
                 return userInput
             }
         }
-        const score = runSingleGame([new HanabiDBAI(), new HanabiDBAI()], true)
+        const score = runSingleGame([new HanabiDBAI("P1"), new HanabiDBAI("P1")], true)
         return score
     }
 
@@ -64,7 +64,8 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman(), new HanabiDBHuman()]))
+        // setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2")]))
+        setG2Controller(new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")]))
         setGame2Running(true)
     }
 

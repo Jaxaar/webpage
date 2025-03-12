@@ -101,6 +101,7 @@ class LocalHanabiGame{
         return imageObj
     }
 
+    // TODO Add removing your drawnCards from the gameImage
     getGameImage(player = null) {
         if(player === null){
             return this
@@ -111,7 +112,6 @@ class LocalHanabiGame{
             blankHand.push(new Card("Card", i))
         }
         gameView.players[player].hand = blankHand
-        console.log(gameView)
         return gameView
     }
 
@@ -138,9 +138,10 @@ class LocalHanabiGame{
             this.fuses = this.fuses - 1
         }
 
-        this.players[player].hand[index-1] = this.drawCard()
+        const drawnCard = this.drawCard()
+        this.players[player].hand[index-1] = drawnCard
 
-        const playObj = new HanabiMovePlay(player, index, card, successfulPlay)
+        const playObj = new HanabiMovePlay(player, index, card, drawnCard, successfulPlay)
         // const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
         if(this.printToConsole) console.info(playObj.toString())
         this.history.push(playObj)
@@ -165,10 +166,10 @@ class LocalHanabiGame{
             this.hints = this.hints + 1
             this.hintsUsed = this.hintsUsed - 1
         }
+        const drawnCard = this.drawCard()
+        this.players[player].hand[index-1] = drawnCard
 
-        this.players[player].hand[index-1] = this.drawCard()
-
-        const discObj = new HanabiMoveDiscard(player, index, card)
+        const discObj = new HanabiMoveDiscard(player, index, card, drawnCard)
         // const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
         if(this.printToConsole) console.info(discObj.toString())
         this.history.push(discObj)

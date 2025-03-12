@@ -3,7 +3,7 @@ import Card from "../../ui/hanabiComponents/Card";
 import { useState, useEffect, useRef } from "react";
 import "../../ui/css/random.css"
 
-export default function HanabiGameInterface(gameController) {
+export default function HanabiGameInterface(gameController, verbose=false) {
 
     let key = 0;
     function getKey() {
@@ -34,7 +34,7 @@ export default function HanabiGameInterface(gameController) {
       });
     useEffect(() => {
         document.addEventListener("HanabiGamestateChanged",() => {
-            console.log("Update gameImage")
+            // console.log("Update gameImage")
             setGameImage(controller.getGameImage())
         })
     }, []);
@@ -67,10 +67,10 @@ export default function HanabiGameInterface(gameController) {
         const targetPlayer = currentlySelectedCard.player
         const targetVal = type==="suit" ? currentlySelectedCard.suit : currentlySelectedCard.value
 
-        console.info("Hint: " + targetVal + " to: " + targetPlayer)
+        if(verbose){console.info("Hint: " + targetVal + " to: " + targetPlayer)}
         const hintVal = controller.handleHint(controller.getThisPlayer(), type, targetVal, targetPlayer)
         if(hintVal === undefined){
-            console.info("Action Failed")
+            console.log("Hint Action Failed")
             return
         }
 
@@ -84,11 +84,11 @@ export default function HanabiGameInterface(gameController) {
     }
 
     function playCard(){
-        console.info("play: " + currentlySelectedCard.index)
+        if(verbose){console.info("play: " + currentlySelectedCard.index)}
         const playVal = controller.playCard(controller.getThisPlayer(), currentlySelectedCard.index)
 
         if(playVal === undefined){
-            console.info("Action Failed")
+            console.log("Play Action Failed")
             return
         }
 
@@ -103,11 +103,11 @@ export default function HanabiGameInterface(gameController) {
     }
 
     function discardCard(){
-        console.info("discard: " + currentlySelectedCard.index)
+        if(verbose){console.info("discard: " + currentlySelectedCard.index)}
         const discVal = controller.discardCard(controller.getThisPlayer(), currentlySelectedCard.index)
 
         if(discVal === undefined){
-            console.info("Action Failed")
+            console.info("Discard Action Failed")
             return
         }
 

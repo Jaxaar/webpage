@@ -17,11 +17,12 @@ class HanabiMove{
 }
 
 class HanabiMovePlay extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card, successfulPlay){
+    constructor(sourcePlayer, targetCardIndex, card, drawnCard, successfulPlay){
         super("play", sourcePlayer)
         this.targetCardIndex = targetCardIndex
         this.card = card
         this.successfulPlay = successfulPlay
+        this.drawnCard = drawnCard
     }
 
     toString(){
@@ -30,10 +31,11 @@ class HanabiMovePlay extends HanabiMove{
 }
 
 class HanabiMoveDiscard extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card){
+    constructor(sourcePlayer, targetCardIndex, card, drawnCard){
         super("discard", sourcePlayer)
         this.targetCardIndex = targetCardIndex
         this.card = card
+        this.drawnCard = drawnCard
     }
 
     toString(){
@@ -57,6 +59,7 @@ class HanabiMoveHint extends HanabiMove{
 
 function convertObjectToHanabiMove(x){
     x.card = Object.assign(new Card, x.card)
+    x.drawnCard = Object.assign(new Card, x.drawnCard)
     if(x.typeOfMove === "hint"){
         return Object.assign(new HanabiMoveHint, x)
     }

@@ -3,9 +3,9 @@ import {Card} from "./HanabiCard";
 
 
 class HanabiDBInput{
-    constructor(){
+    constructor(playerID){
         this.kb = undefined
-        this.playerId = ""
+        this.playerID = playerID
     }
 
     // Is called every time the player needs to make a move:
@@ -17,29 +17,21 @@ class HanabiDBInput{
     // Format: Discard-#: where # is the index and a num 1-handLimit
     async getAction(controller){
 
-        const gameImage = controller.getGameImage()
-        console.log(controller)
-        console.log(gameImage)
+        const gameImage = controller.getGameImage(this.playerID)
+        // console.log(controller)
+        // console.log(gameImage)
 
-        // if(this.kb === undefined){
-        //     initKB(gameImage)
-        // }
-
-        this.initKB(gameImage)
+        this.assimilateRound(gameImage.history)
         console.log(this.kb)
-        // this.assimilateRound(gameImage.history)
+
 
         return this.determinePlay(controller, gameImage)
 
     }
 
-    initKB(gameImage){
-        if(this.playerId === ""){
-            // console.log(gameImage)
-            this.playerId = gameImage.getActivePlayer()
-        }
-        this.kb = new KnowledgeDatabase(gameImage.getGameImage())
-
+    init(controller){
+        this.kb = new KnowledgeDatabase(controller.getGameImage(this.playerID), this.playerID)
+        console.log(this.kb)
     }
 
     assimilateRound(history){
@@ -53,8 +45,8 @@ class HanabiDBInput{
 
 class HanabiDBHuman extends HanabiDBInput{
 
-    constructor(){
-        super()
+    constructor(playerID){
+        super(playerID)
     }
 
 
@@ -86,8 +78,8 @@ class HanabiDBHuman extends HanabiDBInput{
 
 class HanabiDBAI extends HanabiDBInput{
 
-    constructor(){
-        super()
+    constructor(playerID){
+        super(playerID)
     }
 
     /**
@@ -104,53 +96,17 @@ class HanabiDBAI extends HanabiDBInput{
 }
 
 class KnowledgeDatabase{
-    constructor(gameImage){
+    constructor(gameImage, playerID){
+        this.playerID = playerID
         this.cardsVisibleToEveryone = []
         this.cardsUnseen = []
         this.knowledgeOfHands = {}
-        this.playerId = ""
 
         this.initDB(gameImage)
     }
 
     initDB(gameImage){
         console.log("Initializing DB")
-        this.playerId = gameImage.getActivePlayer()
-
-
-        // Set Cards which aren't seen to all
-        this.cardsUnseen = this.getAllCards()
-
-        // Remove the cards which the other players have
-        for(let [pkey, p] of Object.entries(gameImage.players)){
-            if(pkey !== this.playerId){
-                for(let c of p.hand){
-                    // console.log(c)
-                    // console.log(this.cardsUnseen)
-                    // console.log(this.cardsUnseen.findIndex((x) => x.equals(c)))
-                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
-                }
-            }
-        }
-
-
-        // if(!this.reloadEveryTurn){
-        //     // Set cardsVisibleToEveryone (none at the start of the game)
-        //     for(let c of gameImage.discard){
-        //         this.cardsVisibleToEveryone.push(c)
-        //     }
-        //     for(let [suit, c] of Object.entries(gameImage.tableau)){
-        //         if(c.value !== 0) this.cardsVisibleToEveryone.push(c)
-        //     }
-
-        //     // Remove cards everyone can see from the unseen array
-        //     for(let c of this.cardsVisibleToEveryone){
-        //         this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
-        //     }
-        // }
-
-        // Only for testing. Practically the db must be initialized raw at the start of each game not turn to work right
-        this.assimilateHistory(gameImage.history)
 
         // Init blank knowledge for each player
         for(let [pkey, p] of Object.entries(gameImage.players)){
@@ -159,27 +115,52 @@ class KnowledgeDatabase{
                 this.knowledgeOfHands[pkey].push(new Knowledge())
             }
         }
+
+        // Set Cards which aren't seen to all
+        this.cardsUnseen = this.getAllCards()
+
+        console.log(gameImage.players)
+        // Remove the cards which the other players have
+        for(let [pkey, p] of Object.entries(gameImage.players)){
+            if(pkey !== this.playerID){
+                for(let c of p.hand){
+                    console.log(c)
+                    // console.log(this.cardsUnseen)
+                    // console.log(this.cardsUnseen.findIndex((x) => x.equals(c)))
+                    this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
+                }
+            }
+        }
+
+        // // Set cardsVisibleToEveryone (none at the start of the game)
+        // for(let c of gameImage.discard){
+        //     this.cardsVisibleToEveryone.push(c)
+        // }
+        // for(let [suit, c] of Object.entries(gameImage.tableau)){
+        //     if(c.value !== 0) this.cardsVisibleToEveryone.push(c)
+        // }
+
+        // // Remove cards everyone can see from the unseen array
+        // for(let c of this.cardsVisibleToEveryone){
+        //     this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
+        // }
     }
 
-    assimilateHistory(history){
-        console.log("Handle History")
-        for(let obj of history){
-            this.readHistoryEvent(obj)
-        }
-    }
+
 
     assimilateRound(history){
-        console.log("Handle Round")
-        for(let obj of history){
-            const t = this.readHistoryEvent(obj)
-            if(t === "hint" || t === "play" || t === "discard"){
-                return t
+        // console.log("Handle Round")
+        for(let obj of history.reverse()){
+            this.readHistoryEvent(obj)
+            if((obj.typeOfMove === "hint" || obj.typeOfMove === "play" || obj.typeOfMove === "discard") && obj.sourcePlayer === this.playerID){
+                // console.log("Stop")
+                return obj
             }
         }
     }
 
     readHistoryEvent(histObj){
-        console.log(histObj)
+        // console.log(histObj)
 
         if(histObj.typeOfMove === "hint"){
             console.log("Hint")
@@ -195,10 +176,7 @@ class KnowledgeDatabase{
 
             }
 
-            if(histObj.sourcePlayer !== this.playerId){
-                this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1)
-            }
-            this.cardsVisibleToEveryone.push(histObj.card)
+            this.clearAndReplaceCard(histObj)
 
             // Clear player knowledge
 
@@ -206,15 +184,21 @@ class KnowledgeDatabase{
         else if(histObj.typeOfMove === "discard"){
             // console.log("Discard")
 
-            if(histObj.sourcePlayer !== this.playerId){
-                console.log("Split")
-                console.log(this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1))
-            }
-            this.cardsVisibleToEveryone.push(histObj.card)
+            this.clearAndReplaceCard(histObj)
             
             // Clear player knowledge
         }
-        return histObj.typeOfMove
+        return histObj
+    }
+
+    clearAndReplaceCard(histObj){
+        if(histObj.sourcePlayer === this.playerID){
+            this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1)
+        }
+        else if(histObj.drawnCard !== undefined){
+            this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.drawnCard)), 1)
+        }
+        this.cardsVisibleToEveryone.push(histObj.card)
     }
 
     getAllCards(){
