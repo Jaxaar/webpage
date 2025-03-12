@@ -12,6 +12,12 @@ const colorDict = {
 const Suits = ["Red", "Blue", "Green", "Yellow", "White"]
 const Values = {1: 3, 2: 2, 3: 2, 4: 2, 5: 1}
 
+const numberSuffixes = {
+    1: "st",
+    2: "nd",
+    3: "rd",
+    4: "th",
+    5: "th"
+}
 
-
-export {colorDict, Suits, Values}
+export {colorDict, Suits, Values, numberSuffixes}

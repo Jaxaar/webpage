@@ -1,4 +1,6 @@
 import { Suits, Values} from "./hanabiConsts";
+import { HanabiMove, HanabiMoveDiscard, HanabiMoveHint, HanabiMovePlay, convertObjectToHanabiMove } from "./HanabiMoveHistory";
+import { Card, makeCard, castcardsToCards} from "./HanabiCard"
 
 class LocalHanabiGame{
 
@@ -89,13 +91,12 @@ class LocalHanabiGame{
                 .map(({ value }) => value)
     }
 
-    makeCard(card){
-        return new Card(card.suit, card.value)
-    }
+
 
     // TODO: Make more efficient
     getGameDeepCopy () {
-        const image = makeGameFromJSON(JSON.stringify(this))
+        const image = castcardsToCards(JSON.parse(JSON.stringify(this)))
+        const objWithCards = Object.assign(new LocalHanabiGame, image)
         image.history = image.history.map((x) => convertObjectToHanabiMove(x))
         return image
     }
@@ -291,137 +292,4 @@ class LocalHanabiGame{
     }
 }
 
-
-class Card {
-    constructor(suit, value) {
-        this.suit = suit
-        this.value = value
-    }
-
-    toString() {
-        return this.suit + " " + this.value
-    }
-    isSameSuitAs(otherCard){
-        return this.suit == otherCard.suit
-    }
-    isPrevCard(otherCard){
-        return (parseInt(this.value) + 1) == otherCard.value
-    }
-    isAfterCard(otherCard){
-        return (parseInt(this.value)) > otherCard.value
-    }
-    equals(otherCard){
-        return (this.suit === otherCard?.suit && this.value === otherCard?.value)
-    }
-
-}
-
-function castcardsToCards(gameImage){
-    for (let [pName, p] of Object.entries(gameImage.players)){
-        let deck = []
-        for(let c of p.hand){
-            deck.push(makeCard(c))
-        }
-        p.hand = deck
-    }
-    const newTab = {}
-    for(let [suit, card] of Object.entries(gameImage.tableau)){
-        newTab[suit] = makeCard(card)
-    }
-    gameImage.tableau = newTab
-
-    const deck = []
-    for(let c of gameImage.deck){
-        deck.push(makeCard(c))
-    }
-    gameImage.deck = deck
-    
-    return gameImage
-}
-
-function makeCard(card){
-    return new Card(card.suit, card. value)
-}
-
-function makeGameFromJSON(game){
-    const imageWithCards = castcardsToCards(JSON.parse(game))
-
-    return Object.assign(new LocalHanabiGame, imageWithCards)
-}
-
-
-function convertObjectToHanabiMove(x){
-    x.card = Object.assign(new Card, x.card)
-    if(x.typeOfMove === "hint"){
-        return Object.assign(new HanabiMoveHint, x)
-    }
-    else if(x.typeOfMove === "discard"){
-        return Object.assign(new HanabiMoveDiscard, x)
-    }
-    else if(x.typeOfMove === "play"){
-        return Object.assign(new HanabiMovePlay, x)
-    }
-}
-
-/**
- * @abstract
- */
-class HanabiMove{
-    constructor(typeOfMove, sourcePlayer){
-        this.typeOfMove = typeOfMove
-        this.sourcePlayer = sourcePlayer
-    }
-
-    toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s`
-    }
-}
-
-class HanabiMovePlay extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card, successfulPlay){
-        super("play", sourcePlayer)
-        this.targetCardIndex = targetCardIndex
-        this.card = card
-        this.successfulPlay = successfulPlay
-    }
-
-    toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numSuffix[this.targetCardIndex]} card, a ${this.card.toString()}. ${this.successfulPlay ? "Success!" : "Failed and discarded."}`
-    }
-}
-
-class HanabiMoveDiscard extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card){
-        super("discard", sourcePlayer)
-        this.targetCardIndex = targetCardIndex
-        this.card = card
-    }
-
-    toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numSuffix[this.targetCardIndex]} card, a ${this.card.toString()}.`
-    }
-}
-
-class HanabiMoveHint extends HanabiMove{
-    constructor(sourcePlayer, targetPlayer, hintType, hintValue, targetCardIndices){
-        super("hint", sourcePlayer)
-        this.targetPlayer = targetPlayer
-        this.hintType = hintType
-        this.hintValue = hintValue
-        this.targetCardIndices = targetCardIndices
-    }
-
-    toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s - "${this.targetPlayer}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue} ${this.targetCardIndices.length > 1 ? "s" : ""}`
-    }
-}
-
-const numSuffix = {
-    1: "st",
-    2: "nd",
-    3: "rd",
-    4: "th",
-    5: "th"
-}
-
-export {LocalHanabiGame, HanabiMove, Card}
+export {LocalHanabiGame}

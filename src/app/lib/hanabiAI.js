@@ -1,5 +1,5 @@
 import { Suits, Values} from "./hanabiConsts";
-import {Card} from "./LocalHanabiGame";
+import {Card} from "./HanabiCard";
 
 
 
