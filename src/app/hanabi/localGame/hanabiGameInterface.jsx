@@ -2,7 +2,6 @@
 import Card from "../../ui/hanabiComponents/Card";
 import { useState, useEffect, useRef } from "react";
 import "../../ui/css/random.css"
-import { Suspense } from 'react'
 
 export default function HanabiGameInterface(gameController) {
 

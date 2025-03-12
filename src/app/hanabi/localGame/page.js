@@ -1,9 +1,5 @@
 'use client'
-import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
-import { makeGameFromJSON } from "@/app/lib/hanabiAPI";
-import Card from "../../ui/hanabiComponents/Card";
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from 'next/navigation'
 import "../../ui/css/random.css"
 import { Suspense } from 'react'
 import HanabiGameInterface from "./hanabiGameInterface";
