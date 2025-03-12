@@ -2,8 +2,7 @@ import { Suits, Values} from "./hanabiConsts";
 import {Card} from "./HanabiCard";
 
 
-class HanabiDBHuman{
-
+class HanabiDBInput{
     constructor(){
         this.kb = undefined
         this.playerId = ""
@@ -19,14 +18,15 @@ class HanabiDBHuman{
     async getAction(controller){
 
         const gameImage = controller.getGameImage()
-        // console.log(gameImage)
+        console.log(controller)
+        console.log(gameImage)
 
         // if(this.kb === undefined){
         //     initKB(gameImage)
         // }
 
-        // this.initKB(gameImage)
-        // console.log(this.kb)
+        this.initKB(gameImage)
+        console.log(this.kb)
         // this.assimilateRound(gameImage.history)
 
         return this.determinePlay(controller, gameImage)
@@ -38,7 +38,7 @@ class HanabiDBHuman{
             // console.log(gameImage)
             this.playerId = gameImage.getActivePlayer()
         }
-        this.kb = new KnowledgeDatabase(gameImage)
+        this.kb = new KnowledgeDatabase(gameImage.getGameImage())
 
     }
 
@@ -46,6 +46,24 @@ class HanabiDBHuman{
         this.kb.assimilateRound(history)
     }
 
+    async determinePlay(controller, gameImage){
+        return undefined
+    }
+}
+
+class HanabiDBHuman extends HanabiDBInput{
+
+    constructor(){
+        super()
+    }
+
+
+    /**
+     * @override
+     * @param {*} controller 
+     * @param {*} gameImage 
+     * @returns 
+     */
     async determinePlay(controller, gameImage){
 
         const promisedEvent = await this.listenForHanabiInterfaceEvent()
@@ -66,56 +84,22 @@ class HanabiDBHuman{
 }
 
 
-class HanabiDBAI{
+class HanabiDBAI extends HanabiDBInput{
 
     constructor(){
-        this.kb = undefined
-        this.playerId = ""
+        super()
     }
 
-    // Is called every time the player needs to make a move:
-    // curPlayer.getAction(game.getGameImage(curPlayerStr))
-
-    // Valid Actions:
-    // Format: Hint-P#-Type-value  - where p# is the target player Id, Type is Suit or Value, and value is the actual value (color/number) of the clue
-    // Format: Play-#: where # is the index and a num 1-handLimit
-    // Format: Discard-#: where # is the index and a num 1-handLimit
-    getAction(controller){
-        const gameImage = controller.getGameImage()
-        console.log(gameImage)
-
-        // if(this.kb === undefined){
-        //     initKB(gameImage)
-        // }
-        // console.log(gameImage)
-        // this.initKB(gameImage)
-        // console.log(this.kb)
-        // this.assimilateRound(gameImage.history)
-
-        return this.determinePlay(controller, gameImage)
-
-    }
-
-    initKB(gameImage){
-        if(this.playerId === ""){
-            // console.log(gameImage)
-            this.playerId = gameImage.getActivePlayer()
-        }
-        this.kb = new KnowledgeDatabase(gameImage)
-
-    }
-
-    assimilateRound(history){
-        this.kb.assimilateRound(history)
-    }
-
+    /**
+     * @override
+     * @param {*} controller 
+     * @param {*} gameImage 
+     * @returns 
+     */
     determinePlay(controller, gameImage){
 
-        return controller.discardCard(controller.getActivePlayer(), 1)
-        // console.log(gameImage)
-        // let userInput = prompt("Please enter a move:", "Discard-1");
-        // console.log("You entered:", userInput);
-        // return userInput
+        return controller.discardCard(gameImage.getActivePlayer(), 1)
+        
     }
 }
 

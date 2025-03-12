@@ -96,9 +96,9 @@ class LocalHanabiGame{
     // TODO: Make more efficient
     getGameDeepCopy () {
         const image = castcardsToCards(JSON.parse(JSON.stringify(this)))
-        const objWithCards = Object.assign(new LocalHanabiGame, image)
         image.history = image.history.map((x) => convertObjectToHanabiMove(x))
-        return image
+        const imageObj = Object.assign(new LocalHanabiGame, image)
+        return imageObj
     }
 
     getGameImage(player = null) {
@@ -111,6 +111,7 @@ class LocalHanabiGame{
             blankHand.push(new Card("Card", i))
         }
         gameView.players[player].hand = blankHand
+        console.log(gameView)
         return gameView
     }
 

@@ -102,8 +102,8 @@ class HanabiControllerMultiplayer extends HanabiController{
             const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
             console.log(`Player ${curPlayerStr}'s Turn -----------------------------------`)
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
-            console.log(action)
-            console.log(this)
+            // console.log(action)
+            // console.log(this)
             document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
             // console.log(getGameImage().history.map((x) => x.toString()))
         }

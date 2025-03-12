@@ -64,7 +64,7 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman(), new HanabiDBAI()]))
+        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman(), new HanabiDBHuman()]))
         setGame2Running(true)
     }
 
