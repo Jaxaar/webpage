@@ -1,4 +1,3 @@
-import { Card , castcardsToCards, makeGameFromJSON } from "./hanabiAPI";
 import { Suits, Values} from "./hanabiConsts";
 
 class LocalHanabiGame{
@@ -292,6 +291,65 @@ class LocalHanabiGame{
     }
 }
 
+
+class Card {
+    constructor(suit, value) {
+        this.suit = suit
+        this.value = value
+    }
+
+    toString() {
+        return this.suit + " " + this.value
+    }
+    isSameSuitAs(otherCard){
+        return this.suit == otherCard.suit
+    }
+    isPrevCard(otherCard){
+        return (parseInt(this.value) + 1) == otherCard.value
+    }
+    isAfterCard(otherCard){
+        return (parseInt(this.value)) > otherCard.value
+    }
+    equals(otherCard){
+        return (this.suit === otherCard?.suit && this.value === otherCard?.value)
+    }
+
+}
+
+function castcardsToCards(gameImage){
+    for (let [pName, p] of Object.entries(gameImage.players)){
+        let deck = []
+        for(let c of p.hand){
+            deck.push(makeCard(c))
+        }
+        p.hand = deck
+    }
+    const newTab = {}
+    for(let [suit, card] of Object.entries(gameImage.tableau)){
+        newTab[suit] = makeCard(card)
+    }
+    gameImage.tableau = newTab
+
+    const deck = []
+    for(let c of gameImage.deck){
+        deck.push(makeCard(c))
+    }
+    gameImage.deck = deck
+    
+    return gameImage
+}
+
+function makeCard(card){
+    return new Card(card.suit, card. value)
+}
+
+function makeGameFromJSON(game){
+    const imageWithCards = castcardsToCards(JSON.parse(game))
+
+    return Object.assign(new LocalHanabiGame, imageWithCards)
+}
+
+
 function convertObjectToHanabiMove(x){
     x.card = Object.assign(new Card, x.card)
     if(x.typeOfMove === "hint"){
@@ -366,47 +424,4 @@ const numSuffix = {
     5: "th"
 }
 
-
-// :
-// "P1: Hints - "P2: The cards 2 are 1's"."
-// 1
-// :
-// "P2: Plays their 2 card, a Blue 1. Success!"
-// 2
-// :
-// "P1: Hints "P2 - The cards 2 are 1's"."
-// 3
-// :
-// "P2: Plays their 2 card, a Yellow 1. Success!"
-// 4
-// :
-// "P1: Plays their 3 card, a Blue 5. Failed and discarded."
-// 5
-// :
-// "P2: Discards their 2 card, a Red 4."
-// 6
-// :
-// "P1: Hints "P2 - The cards 1,2 are Yellow"."
-// 7
-// :
-// "P2: Hints "P1 - The cards 2,4 are 2's"."
-// 8
-// :
-// "P1: Discards their 4 card, a Red 2."
-// 9
-// :
-// "P2: Hints - "P1: The cards 2,4 are 2's"."
-// 10
-// :
-// "P1: Plays their 4 card, a Blue 2. Success!"
-// 11
-// :
-// "P2: Plays their 3 card, a Blue 3. Success!"
-// 12
-// :
-// "P1: Hints - "P2: The cards 1,2 are Yellow"."
-// 13
-// :
-// "P2: Discards their 1 card, a Yellow 3."
-
-export {LocalHanabiGame, HanabiMove}
+export {LocalHanabiGame, HanabiMove, Card}

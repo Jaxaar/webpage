@@ -21,11 +21,6 @@ export default function HanabiLobby() {
         }
     }
 
-    function onStartv2ButtonPress(){
-        if(buildLocalGame()){
-            redirect("localGamev2", RedirectType.push)
-        }
-    }
 
     function buildLocalGame(){
         if(numPlayers < 2 || numPlayers > 5){
@@ -33,8 +28,8 @@ export default function HanabiLobby() {
             return false
         }
 
-        const game = new LocalHanabiGame(numPlayers, true)
-        sessionStorage.setItem("CurLocalHanabiGame", game.toString())
+        // const game = new LocalHanabiGame(numPlayers, true)
+        // sessionStorage.setItem("CurLocalHanabiGame", game.toString())
 
         const hanabiMetaData = {
             numPlayers: numPlayers,
@@ -64,9 +59,6 @@ export default function HanabiLobby() {
                 </div>
                 <div onClick={onStartButtonPress} className="rand-button mt-4 w-32">
                     Start Game
-                </div>
-                <div onClick={onStartv2ButtonPress} className="rand-button mt-4 w-32">
-                    Start Game V2.
                 </div>
                 <div className="mt-4">
                     <Link href={"localGame"} className="rand-button mt-4 w-36 ">Restart Game</Link>

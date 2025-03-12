@@ -41,6 +41,14 @@ class HanabiController {
         return this.game.handleHint(turnPlayer, type, targetVal, targetPlayer)
     }
 
+    checkGameOver(){
+        return this.game.checkGameOver()
+    }
+
+    scoreGame(){
+        return this.game.scoreGame()
+    }
+
     useSpoilerWall(){
         return false
     }
