@@ -28,9 +28,6 @@ export default function HanabiLobby() {
             return false
         }
 
-        // const game = new LocalHanabiGame(numPlayers, true)
-        // sessionStorage.setItem("CurLocalHanabiGame", game.toString())
-
         const hanabiMetaData = {
             numPlayers: numPlayers,
             spoilerWall: false,
