@@ -1,5 +1,4 @@
-const { LocalHanabiGame } = require("./LocalHanabiGame")
-
+import { LocalHanabiGame } from "./LocalHanabiGame"
 
 
 
