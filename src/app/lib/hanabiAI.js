@@ -2,10 +2,7 @@ import { Suits, Values} from "./hanabiConsts";
 import {Card} from "./HanabiCard";
 
 
-
-
-
-class HanabiDBAI{
+class HanabiDBHuman{
 
     constructor(){
         this.kb = undefined
@@ -19,16 +16,20 @@ class HanabiDBAI{
     // Format: Hint-P#-Type-value  - where p# is the target player Id, Type is Suit or Value, and value is the actual value (color/number) of the clue
     // Format: Play-#: where # is the index and a num 1-handLimit
     // Format: Discard-#: where # is the index and a num 1-handLimit
-    getAction(gameImage){
+    async getAction(controller){
+
+        const gameImage = controller.getGameImage()
+        // console.log(gameImage)
+
         // if(this.kb === undefined){
         //     initKB(gameImage)
         // }
-        // console.log(gameImage)
-        this.initKB(gameImage)
-        console.log(this.kb)
+
+        // this.initKB(gameImage)
+        // console.log(this.kb)
         // this.assimilateRound(gameImage.history)
 
-        return this.determinePlay(gameImage)
+        return this.determinePlay(controller, gameImage)
 
     }
 
@@ -45,11 +46,76 @@ class HanabiDBAI{
         this.kb.assimilateRound(history)
     }
 
-    determinePlay(gameImage){
+    async determinePlay(controller, gameImage){
+
+        const promisedEvent = await this.listenForHanabiInterfaceEvent()
+
+        // console.log(gameImage)
+        // let userInput = prompt("Please enter a move:", "Discard-1");
+        // console.log("You entered:", userInput);
+        return promisedEvent.detail
+    }
+
+    async listenForHanabiInterfaceEvent(){
+        const p = new Promise(resolve => {
+            document.addEventListener("HanabiActionTaken", resolve, {once: true})
+        })
+        // console.log(p)
+        return p
+    }
+}
+
+
+class HanabiDBAI{
+
+    constructor(){
+        this.kb = undefined
+        this.playerId = ""
+    }
+
+    // Is called every time the player needs to make a move:
+    // curPlayer.getAction(game.getGameImage(curPlayerStr))
+
+    // Valid Actions:
+    // Format: Hint-P#-Type-value  - where p# is the target player Id, Type is Suit or Value, and value is the actual value (color/number) of the clue
+    // Format: Play-#: where # is the index and a num 1-handLimit
+    // Format: Discard-#: where # is the index and a num 1-handLimit
+    getAction(controller){
+        const gameImage = controller.getGameImage()
         console.log(gameImage)
-        let userInput = prompt("Please enter a move:", "Discard-1");
-        console.log("You entered:", userInput);
-        return userInput
+
+        // if(this.kb === undefined){
+        //     initKB(gameImage)
+        // }
+        // console.log(gameImage)
+        // this.initKB(gameImage)
+        // console.log(this.kb)
+        // this.assimilateRound(gameImage.history)
+
+        return this.determinePlay(controller, gameImage)
+
+    }
+
+    initKB(gameImage){
+        if(this.playerId === ""){
+            // console.log(gameImage)
+            this.playerId = gameImage.getActivePlayer()
+        }
+        this.kb = new KnowledgeDatabase(gameImage)
+
+    }
+
+    assimilateRound(history){
+        this.kb.assimilateRound(history)
+    }
+
+    determinePlay(controller, gameImage){
+
+        return controller.discardCard(controller.getActivePlayer(), 1)
+        // console.log(gameImage)
+        // let userInput = prompt("Please enter a move:", "Discard-1");
+        // console.log("You entered:", userInput);
+        // return userInput
     }
 }
 
@@ -190,4 +256,4 @@ class Knowledge{
     }
 }
 
-export {HanabiDBAI}
+export {HanabiDBAI, HanabiDBHuman}

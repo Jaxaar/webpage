@@ -32,7 +32,6 @@ class HanabiController {
 
     // Index starts at 1 -> Cards in hand
     discardCard(player, index){
-        
         return this.game.discardCard(player, index)
     }
 
@@ -78,5 +77,41 @@ class HanabiControllerLocalHotseat extends HanabiController{
     }
 }
 
+class HanabiControllerMultiplayer extends HanabiController{
 
-export {HanabiControllerLocalHotseat}
+    constructor(playerCount, players, printToConsole = false){
+        super(new LocalHanabiGame(playerCount, printToConsole))
+        this.waitingForPlayer = true
+        this.arrOfPlayers = players
+        // this.player = "P1"
+        this.runGame()
+    }
+
+    /**
+     * @override
+     * @returns the active player since it's local
+     */
+    getThisPlayer(){
+        // return this.player
+        return this.getActivePlayer()
+    }
+
+    async runGame(){
+        while(!this.checkGameOver()){
+            const curPlayerStr = this.getActivePlayer()
+            const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
+            console.log(`Player ${curPlayerStr}'s Turn -----------------------------------`)
+            const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
+            console.log(action)
+            console.log(this)
+            document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
+            // console.log(getGameImage().history.map((x) => x.toString()))
+        }
+        return this.scoreGame()
+
+
+
+    }
+}
+
+export {HanabiControllerLocalHotseat, HanabiControllerMultiplayer}

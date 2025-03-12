@@ -32,7 +32,12 @@ export default function HanabiGameInterface(gameController) {
           transcriptEnd.current.scrollIntoView({ behavior: 'smooth' });
         }
       });
-
+    useEffect(() => {
+        document.addEventListener("HanabiGamestateChanged",() => {
+            console.log("Update gameImage")
+            setGameImage(controller.getGameImage())
+        })
+    }, []);
     
     function clearSelectedCard(){
         currentlySelectedCard.setClicked(false)
@@ -74,6 +79,7 @@ export default function HanabiGameInterface(gameController) {
         }
 
         clearSelectedCard()
+        triggerHanabiActionEvent(hintVal)
         setGameImage(controller.getGameImage())
     }
 
@@ -92,6 +98,7 @@ export default function HanabiGameInterface(gameController) {
         }
 
         clearSelectedCard()
+        triggerHanabiActionEvent(playVal)
         setGameImage(controller.getGameImage())
     }
 
@@ -109,7 +116,12 @@ export default function HanabiGameInterface(gameController) {
         }
 
         clearSelectedCard()
+        triggerHanabiActionEvent(discVal)
         setGameImage(controller.getGameImage())
+    }
+
+    function triggerHanabiActionEvent(moveValue){
+        document.dispatchEvent(new CustomEvent("HanabiActionTaken", {detail: moveValue}))
     }
 
     return (

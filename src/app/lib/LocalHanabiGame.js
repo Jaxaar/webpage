@@ -146,7 +146,8 @@ class LocalHanabiGame{
 
         this.checkGameOver()
         this.advancePlayer()
-        return this.players[player].hand[index-1]
+        // return this.players[player].hand[index-1]
+        return playObj
     }
 
     // Index starts at 1 -> Cards in hand
@@ -173,7 +174,8 @@ class LocalHanabiGame{
 
         this.checkGameOver()
         this.advancePlayer()
-        return this.players[player].hand[index-1]
+        // return this.players[player].hand[index-1]
+        return discObj
     }
 
     handleHint(sourcePlayer, type, targetVal, targetPlayer){
