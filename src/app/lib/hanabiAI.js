@@ -124,7 +124,7 @@ class KnowledgeDatabase{
         for(let [pkey, p] of Object.entries(gameImage.players)){
             if(pkey !== this.playerID){
                 for(let c of p.hand){
-                    console.log(c)
+                    // console.log(c)
                     // console.log(this.cardsUnseen)
                     // console.log(this.cardsUnseen.findIndex((x) => x.equals(c)))
                     this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(c)), 1)
@@ -150,24 +150,42 @@ class KnowledgeDatabase{
 
     assimilateRound(history){
         // console.log("Handle Round")
-        for(let obj of history.reverse()){
-            this.readHistoryEvent(obj)
+
+        let i = history.length
+        while(i > 0){
+            i--
+            const obj = history[i]
             if((obj.typeOfMove === "hint" || obj.typeOfMove === "play" || obj.typeOfMove === "discard") && obj.sourcePlayer === this.playerID){
-                // console.log("Stop")
-                return obj
+                console.log("Stop")
+                break;
             }
+        }
+        // console.log(i)
+        // console.log(history)
+        while(i < history.length){
+            this.readHistoryEvent(history[i], history)
+            i++
         }
     }
 
-    readHistoryEvent(histObj){
+    readHistoryEvent(histObj, history){
         // console.log(histObj)
 
         if(histObj.typeOfMove === "hint"){
-            console.log("Hint")
+            // console.log("Hint")
+            // console.log(histObj)
+
+            const targetKnowledge = this.knowledgeOfHands[histObj.targetPlayer]
+            for(const i of histObj.targetCardIndices){
+                targetKnowledge[i-1][histObj.hintType] = histObj.hintValue
+            }
+            // console.log(targetKnowledge)
+            // console.log(this.knowledgeOfHands)
+
 
         }
         else if(histObj.typeOfMove === "play"){
-            console.log("Play")
+            // console.log("Play")
 
             if(histObj.successfulPlay){
 
@@ -176,7 +194,7 @@ class KnowledgeDatabase{
 
             }
 
-            this.clearAndReplaceCard(histObj)
+            this.clearAndReplaceCard(histObj, history)
 
             // Clear player knowledge
 
@@ -184,14 +202,14 @@ class KnowledgeDatabase{
         else if(histObj.typeOfMove === "discard"){
             // console.log("Discard")
 
-            this.clearAndReplaceCard(histObj)
+            this.clearAndReplaceCard(histObj, history)
             
             // Clear player knowledge
         }
         return histObj
     }
 
-    clearAndReplaceCard(histObj){
+    clearAndReplaceCard(histObj, history){
         if(histObj.sourcePlayer === this.playerID){
             this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1)
         }
@@ -199,6 +217,8 @@ class KnowledgeDatabase{
             this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.drawnCard)), 1)
         }
         this.cardsVisibleToEveryone.push(histObj.card)
+
+        this.knowledgeOfHands[histObj.sourcePlayer][histObj.targetCardIndex - 1] = new Knowledge(history.length)
     }
 
     getAllCards(){
@@ -217,10 +237,10 @@ class KnowledgeDatabase{
 
 
 class Knowledge{
-    constructor(){
+    constructor(time = 0){
         this.suit = ""
         this.value = -1
-        this.timeDrawn = 0
+        this.timeDrawn = time
     }
 }
 
