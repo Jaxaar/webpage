@@ -255,11 +255,49 @@ class KnowledgeDatabase{
     }
 
     getSafePlay(gameImage){
+        for(let i = 0; i < this.knowledgeOfHands[this.playerID].length; i++){
+            const result = checkIfCardIsSafePlay(gameImage, this.knowledgeOfHands[this.playerID][i])
+            if(result){
+                return i + 1
+            }
+        }
+    }
 
+    checkIfCardIsSafePlay(gameImage, knowledge){
+        const possibleCards = this.getAllPossibleCards(gameImage, knowledge)
+        if(possibleCards.size == 0){
+            console.log("Minor Error, Knowledge entry concluded their hand was impossible, Discarding anomaly"); //TODO Fix anomaly (maybe just reload possibilities every time you cull??
+            return false;
+        }
+        for(const c of possibleCards){
+            if(!gameImage.canPlayCard(c)){
+                return false;
+            }
+        }
+        return true;
     }
     
     getSafeDiscard(gameImage){
+        for(let i = 0; i < this.knowledgeOfHands[this.playerID].length; i++){
+            const result = checkIfCardIsSafeDiscard(gameImage, this.knowledgeOfHands[this.playerID][i])
+            if(result){
+                return i + 1
+            }
+        }
+    }
 
+    checkIfCardIsSafeDiscard(gameImage, knowledge){
+        const possibleCards = this.getAllPossibleCards(gameImage, knowledge)
+        if(possibleCards.size == 0){
+            console.log("Error?? No possibilites? Discard ig");
+            return true;
+        }
+        for(const c of possibleCards){
+            if(c.value >= gameImage.tableau[c.color]){
+                return false;
+            }
+        }
+        return true;
     }
 
     getBestHint(gameImage){
@@ -275,6 +313,23 @@ class KnowledgeDatabase{
             }
         }
         return min
+    }
+
+    getAllPossibleCards(gameImage, knowledge){
+        const possibilites = []
+        for(const c of this.cardsUnseen){
+            let toAdd = false
+            if(knowledge.value !== -1){
+                toAdd = (c.value === knowledge.value)
+            }
+            if(knowledge.suit !== -1){
+                toAdd = (c.suit === knowledge.suit)
+            }
+            if(toAdd){
+                possibilites.push(c)
+            }
+        }
+        return possibilites
     }
 
 }
