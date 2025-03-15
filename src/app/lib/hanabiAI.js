@@ -23,7 +23,7 @@ class HanabiDBInput{
         // console.log(gameImage)
 
         this.assimilateRound(gameImage.history)
-        console.log(this.kb)
+        // console.log(this.kb)
 
 
         return this.determinePlay(controller, gameImage)
@@ -32,7 +32,7 @@ class HanabiDBInput{
 
     init(controller){
         this.kb = new KnowledgeDatabase(controller.getGameImage(this.playerID), this.playerID)
-        console.log(this.kb)
+        // console.log(this.kb)
     }
 
     assimilateRound(history){
@@ -94,31 +94,31 @@ class HanabiDBAI extends HanabiDBInput{
 
         if(this.waitForPermission){
             const reply = await this.listenForMakePlayEvent()
-            console.log(reply)
+            // console.log(reply)
         }
 
         const safePlay = this.kb.getSafePlay(gameImage)
         if(safePlay !== undefined){
-            console.log("safe Play")
+            // console.log("safe Play")
             return controller.playCard(this.playerID, safePlay)
         }
 
         // Might want this after Hint
         const safeDiscard = this.kb.getSafeDiscard(gameImage)
         if(safeDiscard !== undefined){
-            console.log("safe Discard")
+            // console.log("safe Discard")
             return controller.discardCard(this.playerID, safeDiscard)
         }
 
         const bestHint = this.kb.getBestHint(gameImage)
         if(bestHint !== undefined){
-            console.log("Hint")
+            // console.log("Hint")
             return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayer)
         }
 
         const defaultDiscard = this.kb.getdefaultDiscard(gameImage)
         if(defaultDiscard !== undefined){
-            console.log("Default Discard")
+            // console.log("Default Discard")
             return controller.discardCard(this.playerID, defaultDiscard)   
         }
 
@@ -148,7 +148,7 @@ class KnowledgeDatabase{
     }
 
     initDB(gameImage){
-        console.log("Initializing DB")
+        // console.log("Initializing DB")
 
         // Init blank knowledge for each player
         for(let [pkey, p] of Object.entries(gameImage.players)){
@@ -161,7 +161,7 @@ class KnowledgeDatabase{
         // Set Cards which aren't seen to all
         this.cardsUnseen = this.getAllCards()
 
-        console.log(gameImage.players)
+        // console.log(gameImage.players)
         // Remove the cards which the other players have
         for(let [pkey, p] of Object.entries(gameImage.players)){
             if(pkey !== this.playerID){

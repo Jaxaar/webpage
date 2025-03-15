@@ -20,37 +20,39 @@ export default function HanabiAIPage() {
             console.log("Error Bad number of games")
             return
         }
-        if(numPlayers != 2){
-            console.log("Error Bad number of players. Only 2 allowed rn")
+        // if(numPlayers != 2){
+        if(numPlayers < 2 || numPlayers > 5){
+            console.log("Error Bad number of players")
             return
         }
 
-        console.log(`Starting ${numGames} game(s) with ${numPlayers}`)
+        console.log(`Starting ${numGames} game(s) with ${numPlayers} players`)
         // setButtonsClickable(false)
         runGames()
     }
 
-    // function runGames(){
-    //     let score = 0
-    //     for(let i = 0; i < numGames; i++){
-    //         runGame()
-    //     }
-    //     return true
-    // }
+    async function runGames(){
+        let score = 0
+        for(let i = 0; i < numGames; i++){
+            score += await runGame()
+        }
+        console.log(`Avg. Score from ${numGames} games: ${score*1.0 / numGames}`)
+        return true
+    }
 
-    // function runGame(){
-    //     // const hapi = new HanabiAPI()
-    //     const playerMove =  {
-    //         getAction: (gameImage) => {
-    //             console.log(gameImage)
-    //             let userInput = prompt("Please enter a move:");
-    //             console.log("You entered:", userInput);
-    //             return userInput
-    //         }
-    //     }
-    //     const score = runSingleGame([new HanabiDBAI("P1"), new HanabiDBAI("P1")], true)
-    //     return score
-    // }
+    async function runGame(){
+        const players = []
+        
+        for(let i = 0; i < numPlayers; i++){
+            players.push(new HanabiDBAI(`P${i+1}`, false))
+        }
+        
+        const controller = new HanabiControllerMultiplayer(numPlayers, players)
+
+        const score = await controller.runGame()
+        console.log(`Score: ${score}`)
+        return score
+    }
 
     const [game2Running, setGame2Running] = useState(false)
     const [g2Controller, setG2Controller] = useState({})
@@ -64,9 +66,10 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)]))
-        // setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2")]))
+        // setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)]))
+        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2")]))
         // setG2Controller(new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")]))
+        g2Controller.runGame()
         setGame2Running(true)
     }
 

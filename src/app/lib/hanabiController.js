@@ -87,7 +87,7 @@ class HanabiControllerMultiplayer extends HanabiController{
             p.init(this)
         }
         // this.player = "P1"
-        this.runGame()
+        // this.runGame()
     }
 
     // Update to show the active play If human otherwise the most recent active
@@ -104,7 +104,7 @@ class HanabiControllerMultiplayer extends HanabiController{
         while(!this.checkGameOver()){
             const curPlayerStr = this.getActivePlayer()
             const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-            console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)
+            if(this.printToConsole){console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)}
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
             // console.log(action)
             // console.log(this)
