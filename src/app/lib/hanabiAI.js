@@ -90,23 +90,23 @@ class HanabiDBAI extends HanabiDBInput{
      */
     determinePlay(controller, gameImage){
 
-        const safePlay = kb.getSafePlay(gameImage)
+        const safePlay = this.kb.getSafePlay(gameImage)
         if(safePlay !== undefined){
             return controller.playCard(this.playerID, safePlay)
         }
 
         // Might want this after Hint
-        const safeDiscard = kb.getSafeDiscard(gameImage)
+        const safeDiscard = this.kb.getSafeDiscard(gameImage)
         if(safeDiscard !== undefined){
             return controller.discardCard(this.playerID, safeDiscard)
         }
 
-        const bestHint = kb.getBestHint(gameImage)
+        const bestHint = this.kb.getBestHint(gameImage)
         if(bestHint !== undefined){
             return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayer)
         }
 
-        const defaultDiscard = kb.getdefaultDiscard(gameImage)
+        const defaultDiscard = this.kb.getdefaultDiscard(gameImage)
         if(defaultDiscard !== undefined){
             return controller.discardCard(this.playerID, defaultDiscard)   
         }
@@ -256,7 +256,7 @@ class KnowledgeDatabase{
 
     getSafePlay(gameImage){
         for(let i = 0; i < this.knowledgeOfHands[this.playerID].length; i++){
-            const result = checkIfCardIsSafePlay(gameImage, this.knowledgeOfHands[this.playerID][i])
+            const result = this.checkIfCardIsSafePlay(gameImage, this.knowledgeOfHands[this.playerID][i])
             if(result){
                 return i + 1
             }
@@ -279,7 +279,7 @@ class KnowledgeDatabase{
     
     getSafeDiscard(gameImage){
         for(let i = 0; i < this.knowledgeOfHands[this.playerID].length; i++){
-            const result = checkIfCardIsSafeDiscard(gameImage, this.knowledgeOfHands[this.playerID][i])
+            const result = this.checkIfCardIsSafeDiscard(gameImage, this.knowledgeOfHands[this.playerID][i])
             if(result){
                 return i + 1
             }
@@ -302,6 +302,44 @@ class KnowledgeDatabase{
 
     getBestHint(gameImage){
 
+        if(gameImage.hints <= 0){
+            return undefined
+        }
+
+        // TODO: Check for save hints
+
+        // Play Hints
+        for(const p of gameImage.players){ //Make it start at the next player not player 0...
+            if(p.name === this.playerID){
+                continue
+            }
+            for(let i = 0; i < p.hand.length; i++){
+                const card = p.hand[i]
+                if(!gameImage.canPlayCard(card)){
+                    continue
+                }
+                const cardKnowledge = this.cardKnowledge[p.name][i]
+
+                if(cardKnowledge.value === -1){
+                    return {
+                        targetPlayer: p.name,
+                        type: "number",
+                        val: card.value
+                    }
+                }
+                else if(cardKnowledge.suit === ""){
+                    return {
+                        targetPlayer: p.name,
+                        type: "suit",
+                        val: card.suit
+                    }
+                }
+                else{
+                    continue
+                }
+            }
+        } 
+        return undefined
     }
 
     getdefaultDiscard(gameImage){
