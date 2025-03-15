@@ -1,5 +1,6 @@
 import { Suits, Values} from "./hanabiConsts";
 import {Card} from "./HanabiCard";
+import react from "react";
 
 
 class HanabiDBInput{
@@ -78,8 +79,9 @@ class HanabiDBHuman extends HanabiDBInput{
 
 class HanabiDBAI extends HanabiDBInput{
 
-    constructor(playerID){
+    constructor(playerID, waitForPermission = false){
         super(playerID)
+        this.waitForPermission = waitForPermission
     }
 
     /**
@@ -88,7 +90,12 @@ class HanabiDBAI extends HanabiDBInput{
      * @param {*} gameImage 
      * @returns 
      */
-    determinePlay(controller, gameImage){
+    async determinePlay(controller, gameImage){
+
+        if(this.waitForPermission){
+            const reply = await this.listenForMakePlayEvent()
+            console.log(reply)
+        }
 
         const safePlay = this.kb.getSafePlay(gameImage)
         if(safePlay !== undefined){
@@ -119,6 +126,14 @@ class HanabiDBAI extends HanabiDBInput{
         console.log("uh oh")
         return undefined
         
+    }
+
+    async listenForMakePlayEvent(){
+        const p = new Promise(resolve => {
+            document.addEventListener("HanabiAIGoAhead", resolve, {once: true})
+        })
+        // console.log(p)
+        return p
     }
 }
 

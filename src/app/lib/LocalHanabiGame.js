@@ -1,5 +1,5 @@
 import { Suits, Values} from "./hanabiConsts";
-import { HanabiMove, HanabiMoveDiscard, HanabiMoveHint, HanabiMovePlay, convertObjectToHanabiMove } from "./HanabiMoveHistory";
+import { HanabiHistoryMessage, HanabiMove, HanabiMoveDiscard, HanabiMoveHint, HanabiMovePlay, convertObjectToHanabiMove } from "./HanabiMoveHistory";
 import { Card, makeCard, castcardsToCards} from "./HanabiCard"
 
 class LocalHanabiGame{
@@ -275,7 +275,7 @@ class LocalHanabiGame{
     }
 
     gameOver(){
-        const gameOverMessage = "Game Over! Score: " + this.scoreGame()
+        const gameOverMessage = new HanabiHistoryMessage("TheGame", "Game Over! Score: " + this.scoreGame(), false)
         if(this.printToConsole) console.info("Game Over! Score: " + this.scoreGame())
         this.history.push(gameOverMessage)
         this.gameEnded = true

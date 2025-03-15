@@ -57,6 +57,17 @@ class HanabiMoveHint extends HanabiMove{
     }
 }
 
+class HanabiHistoryMessage extends HanabiMove{
+    constructor(sourcePlayer, text, displayOrigin = true){
+        super("message", sourcePlayer)
+        this.text = text
+    }
+
+    toString(){
+        return `${this.displayOrigin ? this.source : ""} ${this.text}`
+    }
+}
+
 function convertObjectToHanabiMove(x){
     x.card = Object.assign(new Card, x.card)
     x.drawnCard = Object.assign(new Card, x.drawnCard)
@@ -69,7 +80,10 @@ function convertObjectToHanabiMove(x){
     else if(x.typeOfMove === "play"){
         return Object.assign(new HanabiMovePlay, x)
     }
+    else if(x.typeOfMove === "message"){
+        return Object.assign(new HanabiHistoryMessage, x)
+    }
 }
 
 
-export {HanabiMove, HanabiMoveDiscard, HanabiMovePlay, HanabiMoveHint, convertObjectToHanabiMove}
+export {HanabiMove, HanabiMoveDiscard, HanabiMovePlay, HanabiMoveHint, HanabiHistoryMessage, convertObjectToHanabiMove}

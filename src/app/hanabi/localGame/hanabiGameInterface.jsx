@@ -229,7 +229,7 @@ export default function HanabiGameInterface(gameController, verbose=false) {
                             ||
                             <div>
                                 <div className="mt-2"> Game Over! Score: {gameImage.scoreGame()}</div>
-                                <button className="rand-button" onClick={start}>Play Again?</button>
+                                {/* <button className="rand-button" onClick={start}>Play Again?</button> */}
                             </div>
                         }
                         <div className="mt-8">
@@ -249,7 +249,7 @@ export default function HanabiGameInterface(gameController, verbose=false) {
                     <div className="bg-white p-2 m-2 w-[26rem] border-2 border-black">
                         <div className="font-bold border-b-2 border-black">Transcript</div>
                         <div className="overflow-auto max-h-72">
-                            {gameImage.history.map((x) => x.toString()).map((event) => (
+                            {gameImage.history.map((x) => {if(x){return x.toString()}}).map((event) => (
                                 <div key={getKey()}>{event}</div>
                             ))}
                             <div ref={transcriptEnd}></div>

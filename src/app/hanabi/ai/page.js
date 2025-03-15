@@ -30,27 +30,27 @@ export default function HanabiAIPage() {
         runGames()
     }
 
-    function runGames(){
-        let score = 0
-        for(let i = 0; i < numGames; i++){
-            runGame()
-        }
-        return true
-    }
+    // function runGames(){
+    //     let score = 0
+    //     for(let i = 0; i < numGames; i++){
+    //         runGame()
+    //     }
+    //     return true
+    // }
 
-    function runGame(){
-        // const hapi = new HanabiAPI()
-        const playerMove =  {
-            getAction: (gameImage) => {
-                console.log(gameImage)
-                let userInput = prompt("Please enter a move:");
-                console.log("You entered:", userInput);
-                return userInput
-            }
-        }
-        const score = runSingleGame([new HanabiDBAI("P1"), new HanabiDBAI("P1")], true)
-        return score
-    }
+    // function runGame(){
+    //     // const hapi = new HanabiAPI()
+    //     const playerMove =  {
+    //         getAction: (gameImage) => {
+    //             console.log(gameImage)
+    //             let userInput = prompt("Please enter a move:");
+    //             console.log("You entered:", userInput);
+    //             return userInput
+    //         }
+    //     }
+    //     const score = runSingleGame([new HanabiDBAI("P1"), new HanabiDBAI("P1")], true)
+    //     return score
+    // }
 
     const [game2Running, setGame2Running] = useState(false)
     const [g2Controller, setG2Controller] = useState({})
@@ -64,9 +64,14 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2")]))
+        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)]))
+        // setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2")]))
         // setG2Controller(new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")]))
         setGame2Running(true)
+    }
+
+    function AIGoAhead(){
+        document.dispatchEvent(new CustomEvent("HanabiAIGoAhead"))
     }
 
     return (
@@ -90,9 +95,12 @@ export default function HanabiAIPage() {
                     Start Game
                 </div>
                 <div onClick={() => buttonsClickable ? onStart2ButtonPress() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
-                    Start Game2
+                    Play AI
                 </div>
                 {game2Running && <div className="m-4 h-[700]">
+                    <div onClick={() => buttonsClickable ? AIGoAhead() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
+                        Let AI Play Move
+                    </div>
                     <HanabiGameInterface gameController={g2Controller}></HanabiGameInterface>
                 </div>}
             </div>
