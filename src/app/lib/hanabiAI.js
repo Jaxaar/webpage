@@ -92,22 +92,26 @@ class HanabiDBAI extends HanabiDBInput{
 
         const safePlay = this.kb.getSafePlay(gameImage)
         if(safePlay !== undefined){
+            console.log("safe Play")
             return controller.playCard(this.playerID, safePlay)
         }
 
         // Might want this after Hint
         const safeDiscard = this.kb.getSafeDiscard(gameImage)
         if(safeDiscard !== undefined){
+            console.log("safe Discard")
             return controller.discardCard(this.playerID, safeDiscard)
         }
 
         const bestHint = this.kb.getBestHint(gameImage)
         if(bestHint !== undefined){
+            console.log("Hint")
             return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayer)
         }
 
         const defaultDiscard = this.kb.getdefaultDiscard(gameImage)
         if(defaultDiscard !== undefined){
+            console.log("Default Discard")
             return controller.discardCard(this.playerID, defaultDiscard)   
         }
 
@@ -189,7 +193,7 @@ class KnowledgeDatabase{
             i--
             const obj = history[i]
             if((obj.typeOfMove === "hint" || obj.typeOfMove === "play" || obj.typeOfMove === "discard") && obj.sourcePlayer === this.playerID){
-                console.log("Stop")
+                // console.log("Stop")
                 break;
             }
         }
@@ -261,11 +265,12 @@ class KnowledgeDatabase{
                 return i + 1
             }
         }
+        return undefined
     }
 
     checkIfCardIsSafePlay(gameImage, knowledge){
         const possibleCards = this.getAllPossibleCards(gameImage, knowledge)
-        if(possibleCards.size == 0){
+        if(possibleCards.length == 0){
             console.log("Minor Error, Knowledge entry concluded their hand was impossible, Discarding anomaly"); //TODO Fix anomaly (maybe just reload possibilities every time you cull??
             return false;
         }
@@ -288,12 +293,12 @@ class KnowledgeDatabase{
 
     checkIfCardIsSafeDiscard(gameImage, knowledge){
         const possibleCards = this.getAllPossibleCards(gameImage, knowledge)
-        if(possibleCards.size == 0){
+        if(possibleCards.length === 0){
             console.log("Error?? No possibilites? Discard ig");
             return true;
         }
         for(const c of possibleCards){
-            if(c.value >= gameImage.tableau[c.color]){
+            if(c.value >= gameImage.tableau[c.suit].value){
                 return false;
             }
         }
@@ -309,8 +314,8 @@ class KnowledgeDatabase{
         // TODO: Check for save hints
 
         // Play Hints
-        for(const p of gameImage.players){ //Make it start at the next player not player 0...
-            if(p.name === this.playerID){
+        for(const [pID, p] of Object.entries(gameImage.players)){ //Make it start at the next player not player 0...
+            if(pID === this.playerID){
                 continue
             }
             for(let i = 0; i < p.hand.length; i++){
@@ -318,18 +323,18 @@ class KnowledgeDatabase{
                 if(!gameImage.canPlayCard(card)){
                     continue
                 }
-                const cardKnowledge = this.cardKnowledge[p.name][i]
+                const cardKnowledge = this.knowledgeOfHands[pID][i]
 
                 if(cardKnowledge.value === -1){
                     return {
-                        targetPlayer: p.name,
-                        type: "number",
+                        targetPlayer: pID,
+                        type: "value",
                         val: card.value
                     }
                 }
                 else if(cardKnowledge.suit === ""){
                     return {
-                        targetPlayer: p.name,
+                        targetPlayer: pID,
                         type: "suit",
                         val: card.suit
                     }
@@ -343,24 +348,24 @@ class KnowledgeDatabase{
     }
 
     getdefaultDiscard(gameImage){
-        let min = 1
+        let minIdx = 0
         const vals = this.knowledgeOfHands[this.playerID].map(k => k.timeDrawn)
         for(let i = 0; i < vals.length; i++){
-            if(vals[i] <= vals[min]){
-                min = i
+            if(vals[i] <= vals[minIdx]){
+                minIdx = i
             }
         }
-        return min
+        return minIdx + 1
     }
 
     getAllPossibleCards(gameImage, knowledge){
         const possibilites = []
         for(const c of this.cardsUnseen){
-            let toAdd = false
+            let toAdd = true
             if(knowledge.value !== -1){
                 toAdd = (c.value === knowledge.value)
             }
-            if(knowledge.suit !== -1){
+            if(toAdd && knowledge.suit !== ""){
                 toAdd = (c.suit === knowledge.suit)
             }
             if(toAdd){
