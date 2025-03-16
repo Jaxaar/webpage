@@ -14,6 +14,8 @@ export default function HanabiAIPage() {
     const [numPlayers, setNumPlayers] = useState(2)
     const [numGames, setNumGames] = useState(1)
     const [buttonsClickable, setButtonsClickable] = useState(true)
+    const [AIShouldWait, setAIShouldWait] = useState(false)
+    const [avgScore, setAvgScore] = useState(undefined)
 
     function onStartButtonPress(){
         if(numGames < 0 || numGames > 10000){
@@ -37,6 +39,7 @@ export default function HanabiAIPage() {
             score += await runGame()
         }
         console.log(`Avg. Score from ${numGames} games: ${score*1.0 / numGames}`)
+        setAvgScore(score*1.0 / numGames)
         return true
     }
 
@@ -66,10 +69,12 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        // setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)]))
-        setG2Controller(new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2")]))
-        // setG2Controller(new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")]))
-        g2Controller.runGame()
+        // const controller = new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)])
+        const controller = new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2", AIShouldWait)])
+        // const controller = new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")])
+
+        controller.runGame()
+        setG2Controller(controller)
         setGame2Running(true)
     }
 
@@ -87,23 +92,39 @@ export default function HanabiAIPage() {
                     Setup AI Game:
                 </div>
                 <div>
-                    <span>Number of players: </span>
+                    <span className="italic">Number of players: </span>
                     <input type="text" name="numPlayers"  value = {numPlayers} placeholder="" className="border-2 p-1" onChange={(event) => buttonsClickable ? setNumPlayers(event.target.value) : () => {}}></input>
                 </div>
                 <div>
-                    <span>Number games: </span>
+                    <span className="italic">Number games: </span>
                     <input type="text" name="numGames" value = {numGames} placeholder="" className="border-2 p-1" onChange={(event) => buttonsClickable ? setNumGames(event.target.value) : () => {}}></input>
                 </div>
-                <div onClick={() => buttonsClickable ? onStartButtonPress() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
-                    Start Game
+                <div onClick={() => buttonsClickable ? onStartButtonPress() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-40`}>
+                    Run Simulation
+                </div>
+                {avgScore &&
+                    <div className="italic ml-6">
+                        Avg. Score: {avgScore}
+                    </div>
+                }
+
+
+                <div className="mt-4">
+                    Play with the AI:
+                </div>
+                <div>
+                    <span className="italic">AI should wait for permission to play: </span>
+                    <input type="checkbox" name="aiWaiting" onChange={(event) => setAIShouldWait(event.target.value)} className="border-2 p-1"></input>
                 </div>
                 <div onClick={() => buttonsClickable ? onStart2ButtonPress() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
                     Play AI
                 </div>
                 {game2Running && <div className="m-4 h-[700]">
-                    <div onClick={() => buttonsClickable ? AIGoAhead() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
-                        Let AI Play Move
-                    </div>
+                    {AIShouldWait &&
+                        <div onClick={() => buttonsClickable ? AIGoAhead() : () => {}} className={`${buttonsClickable ? "rand-button" : "rand-button-unclickable"} mt-4 w-32`}>
+                            Let AI Play Move
+                        </div>
+                    }
                     <HanabiGameInterface gameController={g2Controller}></HanabiGameInterface>
                 </div>}
             </div>
