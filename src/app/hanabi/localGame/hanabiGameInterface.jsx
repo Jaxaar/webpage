@@ -31,13 +31,13 @@ export default function HanabiGameInterface(gameController, verbose=false) {
         if (transcriptEnd.current) {
           transcriptEnd.current.scrollIntoView({ behavior: 'smooth' });
         }
-      });
+      })
     useEffect(() => {
         document.addEventListener("HanabiGamestateChanged",() => {
             // console.log("Update gameImage")
             setGameImage(controller.getGameImage())
         })
-    }, []);
+    }, [])
     
     function clearSelectedCard(){
         currentlySelectedCard.setClicked(false)

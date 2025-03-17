@@ -3,14 +3,35 @@ import Link from "next/link";
 import { useState } from "react";
 import "../../ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
+import { useEffect } from "react";
 
 
 export default function HanabiLobby() {
 
+    let key = 0;
+    function getKey() {
+        key = key + 1
+        return key
+    }
+
+    const maxPlayers = 5
+
     // const [numPlayers, setNumPlayers] = useState(-1)
     const [numPlayers, setNumPlayers] = useState(2)
+    const [playerSelector, setPlayerSelector] = useState([])
+    const [playerNames, setplayerNames] = useState([])
 
 
+    useEffect(() => {
+        setPlayerSelector(Array.from({length: maxPlayers}, (_, index) => "Human"))
+        setplayerNames(Array.from({length: maxPlayers}, (_, index) => `P${index+1}`))
+    }, [])
+
+    const [update, setUpdate] = useState(true)
+    function forceUpdate(){
+         setUpdate(!update)
+    }
+    console.log("Update")
 
     function onStartButtonPress(){
         if(buildLocalGame()){
@@ -27,6 +48,8 @@ export default function HanabiLobby() {
 
         const hanabiMetaData = {
             numPlayers: numPlayers,
+            playerTypes: playerSelector,
+            playerNames: playerNames,
             spoilerWall: false,
         }
         sessionStorage.setItem("LoadingHanabiGameMetaData", JSON.stringify(hanabiMetaData))
@@ -45,7 +68,45 @@ export default function HanabiLobby() {
                 </div>
                 <div>
                     <span>Number of players: </span>
-                    <input type="text" name="numPlayers" placeholder="2-5" className="border-2 p-1" onChange={(event) => setNumPlayers(event.target.value)}></input>
+                    <select 
+                        value={numPlayers} 
+                        onChange={(event) => setNumPlayers(event.target.value)} 
+                    >
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    {/* <input type="text" name="numPlayers" placeholder="2-5" className="border-2 p-1" onChange={(event) => setNumPlayers(event.target.value)}></input> */}
+                </div>
+                <div>
+                    {(Array.from({length: numPlayers}, (_, index) => index)).map((index) => (
+                        <div key={index}>
+                            <span>Player {index+1}: </span>
+                            <span>
+                                <select 
+                                    value={playerSelector[index]} 
+                                    onChange={(event) => {
+                                        playerSelector[index] = event.target.value
+                                        console.log(playerSelector)
+                                        forceUpdate()
+                                        }} 
+                                    >
+                                    <option value="Human">Human</option>
+                                    <option value="AIv1 ">Radish</option>
+                                    <option value="AIv1">AI v.1</option>
+                                </select>
+                            </span>
+                            <span>
+                                {/*
+                                <input type="text" value={playerNames[index]} placeholder="name" className="border-2 p-1" onChange={(event) => {
+                                    playerNames[index] = event.target.value
+                                    console.log(playerNames)
+                                    // forceUpdate()
+                                }}></input> */}
+                            </span>
+                        </div>
+                    ))}
                 </div>
                 <div>
                     <span>Use Spoiler Wall: </span>
@@ -57,6 +118,7 @@ export default function HanabiLobby() {
                 <div className="mt-4">
                     <Link href={"localGame"} className="rand-button mt-4 w-36 ">Restart Game</Link>
                 </div>
+
                 
                 {/* <div className="mt-10">
                     {["Red", "Blue", "Green", "Yellow", "White"].map((color) =>(
