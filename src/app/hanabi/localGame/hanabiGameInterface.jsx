@@ -157,8 +157,8 @@ export default function HanabiGameInterface(gameController, verbose=false) {
                         <div className="mt-3">
                             {/* Row Per Player */}
                             <div>
-                                {Object.entries(gameImage.players).map(([playerKey, player]) => (
-                                    <div key={playerKey} className="flex flex-row">
+                                {gameImage.players.map((player) => (
+                                    <div key={player.id} className="flex flex-row">
                                         <div className="m-2">
                                             {player.activePlayer 
                                             && <span className = "ml-1.5">{" > "}</span> 
@@ -173,8 +173,8 @@ export default function HanabiGameInterface(gameController, verbose=false) {
                                                     key={getKey()} 
                                                     suit={card.suit} 
                                                     value={card.value}
-                                                    player={playerKey}
-                                                    canSee={playerKey !== controller.getThisPlayer()} 
+                                                    player={player.id}
+                                                    canSee={player.id !== controller.getThisPlayer()} 
                                                     cardSelected = {cardSelected}
                                                     index={index+1}
                                                 ></Card>

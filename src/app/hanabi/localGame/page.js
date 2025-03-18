@@ -17,10 +17,10 @@ function ActualHanabiLobby() {
         
         const players = []
         for(let i = 0; i < hanabiMetaData.numPlayers; i++){
-            players[i] = createNewPlayer(hanabiMetaData.playerTypes?.[i], hanabiMetaData.playerNames?.[i])
+            players[i] = createNewPlayer(hanabiMetaData.playerTypes?.[i], i, hanabiMetaData.playerNames?.[i])
         }
         // console.log(hanabiMetaData)
-        // console.log(players)
+        console.log(players)
 
         const contr = new HanabiControllerLocalHotseat(hanabiMetaData.numPlayers, players, hanabiMetaData?.spoilerWall)
         contr.runGame()
@@ -28,14 +28,19 @@ function ActualHanabiLobby() {
         setControllerLoaded(true)
       }, [])
 
-    function createNewPlayer(type, name){
+    function createNewPlayer(type, id, name){
         switch (type.toLowerCase()){
             case "human":
-                return new HanabiDBHuman(name)
+                return {
+                    input: new HanabiDBHuman(id),
+                    name: name,
+                }
                 // break
             case "aiv1":
-                return new HanabiDBAI(name)
-                // break
+                return {
+                    input: new HanabiDBAI(id),
+                    name: name,
+                }                // break
         }
 
 

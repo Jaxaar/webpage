@@ -113,7 +113,7 @@ class HanabiDBAI extends HanabiDBInput{
         const bestHint = this.kb.getBestHint(gameImage)
         if(bestHint !== undefined){
             // console.log("Hint")
-            return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayer)
+            return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayerID)
         }
 
         const defaultDiscard = this.kb.getdefaultDiscard(gameImage)
@@ -151,10 +151,10 @@ class KnowledgeDatabase{
         // console.log("Initializing DB")
 
         // Init blank knowledge for each player
-        for(let [pkey, p] of Object.entries(gameImage.players)){
-            this.knowledgeOfHands[pkey] = []
+        for(let p of gameImage.players){
+            this.knowledgeOfHands[p.id] = []
             for(let c of p.hand){
-                this.knowledgeOfHands[pkey].push(new Knowledge())
+                this.knowledgeOfHands[p.id].push(new Knowledge())
             }
         }
 
@@ -163,8 +163,8 @@ class KnowledgeDatabase{
 
         // console.log(gameImage.players)
         // Remove the cards which the other players have
-        for(let [pkey, p] of Object.entries(gameImage.players)){
-            if(pkey !== this.playerID){
+        for(let p of gameImage.players){
+            if(p.id !== this.playerID){
                 for(let c of p.hand){
                     // console.log(c)
                     // console.log(this.cardsUnseen)
@@ -207,7 +207,7 @@ class KnowledgeDatabase{
         while(i > 0){
             i--
             const obj = history[i]
-            if((obj.typeOfMove === "hint" || obj.typeOfMove === "play" || obj.typeOfMove === "discard") && obj.sourcePlayer === this.playerID){
+            if((obj.typeOfMove === "hint" || obj.typeOfMove === "play" || obj.typeOfMove === "discard") && obj.sourcePlayerID === this.playerID){
                 // console.log("Stop")
                 break;
             }
@@ -227,7 +227,7 @@ class KnowledgeDatabase{
             // console.log("Hint")
             // console.log(histObj)
 
-            const targetKnowledge = this.knowledgeOfHands[histObj.targetPlayer]
+            const targetKnowledge = this.knowledgeOfHands[histObj.targetPlayerID]
             for(const i of histObj.targetCardIndices){
                 targetKnowledge[i-1][histObj.hintType] = histObj.hintValue
             }
@@ -262,15 +262,14 @@ class KnowledgeDatabase{
     }
 
     clearAndReplaceCard(histObj, history){
-        if(histObj.sourcePlayer === this.playerID){
+        if(histObj.sourcePlayerID === this.playerID){
             this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.card)), 1)
         }
         else if(histObj.drawnCard !== undefined){
             this.cardsUnseen.splice(this.cardsUnseen.findIndex((x) => x.equals(histObj.drawnCard)), 1)
         }
         this.cardsVisibleToEveryone.push(histObj.card)
-
-        this.knowledgeOfHands[histObj.sourcePlayer][histObj.targetCardIndex - 1] = new Knowledge(history.length)
+        this.knowledgeOfHands[histObj.sourcePlayerID][histObj.targetCardIndex - 1] = new Knowledge(history.length)
     }
 
     getSafePlay(gameImage){
@@ -329,8 +328,8 @@ class KnowledgeDatabase{
         // TODO: Check for save hints
 
         // Play Hints
-        for(const [pID, p] of Object.entries(gameImage.players)){ //Make it start at the next player not player 0...
-            if(pID === this.playerID){
+        for(const p of gameImage.players){ //Make it start at the next player not player 0...
+            if(p.id === this.playerID){
                 continue
             }
             for(let i = 0; i < p.hand.length; i++){
@@ -338,18 +337,18 @@ class KnowledgeDatabase{
                 if(!gameImage.canPlayCard(card)){
                     continue
                 }
-                const cardKnowledge = this.knowledgeOfHands[pID][i]
+                const cardKnowledge = this.knowledgeOfHands[p.id][i]
 
                 if(cardKnowledge.value === -1){
                     return {
-                        targetPlayer: pID,
+                        targetPlayerID: p.id,
                         type: "value",
                         val: card.value
                     }
                 }
                 else if(cardKnowledge.suit === ""){
                     return {
-                        targetPlayer: pID,
+                        targetPlayerID: p.id,
                         type: "suit",
                         val: card.suit
                     }

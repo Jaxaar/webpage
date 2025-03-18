@@ -47,7 +47,9 @@ export default function HanabiAIPage() {
         const players = []
         
         for(let i = 0; i < numPlayers; i++){
-            players.push(new HanabiDBAI(`P${i+1}`, false))
+            players.push({
+                input: new HanabiDBAI(i, false)
+            })
         }
         
         const controller = new HanabiControllerMultiplayer(numPlayers, players)
@@ -70,7 +72,7 @@ export default function HanabiAIPage() {
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
         // const controller = new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)])
-        const controller = new HanabiControllerMultiplayer(2, [new HanabiDBHuman("P1"), new HanabiDBAI("P2", AIShouldWait)])
+        const controller = new HanabiControllerMultiplayer(2, [{input: new HanabiDBHuman(0)}, {input:new HanabiDBAI(1, AIShouldWait)}])
         // const controller = new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")])
 
         controller.runGame()

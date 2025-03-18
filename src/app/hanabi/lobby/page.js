@@ -108,12 +108,12 @@ export default function HanabiLobby() {
                             </span>
                             <span>
                                 
-                                {/* <input type="text" value={playerNames[index]} placeholder="name" className="border-2 p-1" onChange={(event) => {
+                                <input type="text" value={playerNames[index]} placeholder="name" className="border-2 p-1" onChange={(event) => {
                                     // playerNames[index] = event.target.value
                                     updateListState(setplayerNames, playerNames, index, event.target.value)
                                     // console.log(playerNames)
                                     // forceUpdate()
-                                }}></input> */}
+                                }}></input>
                             </span>
                         </div>
                     ))}

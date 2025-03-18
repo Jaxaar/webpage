@@ -9,8 +9,12 @@ import { LocalHanabiGame } from "./LocalHanabiGame"
 
 class HanabiController {
 
-    constructor(game){
+    constructor(game, players){
         this.game = game
+        this.arrOfPlayers = players
+        for(const p of this.arrOfPlayers){
+            p.init(this)
+        }
     }
 
     getThisPlayer(){
@@ -55,12 +59,8 @@ class HanabiController {
 class HanabiControllerLocalHotseat extends HanabiController{
 
     constructor(playerCount, players, spoilerWall, printToConsole = false){
-        super(new LocalHanabiGame(playerCount, printToConsole))
+        super(new LocalHanabiGame(playerCount, players.map(x => x?.name), printToConsole), players.map(x => x?.input))
         this.useSpoilerWallFlag = spoilerWall
-        this.arrOfPlayers = players
-        for(const p of players){
-            p.init(this)
-        }
     }
 
     /**
@@ -73,9 +73,12 @@ class HanabiControllerLocalHotseat extends HanabiController{
 
     async runGame(){
         while(!this.checkGameOver()){
-            const curPlayerStr = this.getActivePlayer()
-            const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-            if(this.printToConsole){console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)}
+            const curPlayerID = this.getActivePlayer()
+            console.log(this.arrOfPlayers)
+            console.log(curPlayerID)
+            const curPlayer = this.arrOfPlayers[curPlayerID]
+            console.log(curPlayer)
+            if(this.printToConsole){console.log(`-----------------------------------\n\n ${curPlayer.name}'s Turn \n\n-----------------------------------`)}
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
             // console.log(action)
             // console.log(this)
@@ -97,12 +100,9 @@ class HanabiControllerLocalHotseat extends HanabiController{
 class HanabiControllerMultiplayer extends HanabiController{
 
     constructor(playerCount, players, printToConsole = false){
-        super(new LocalHanabiGame(playerCount, printToConsole))
+        super(new LocalHanabiGame(playerCount, players.map(x => x?.name), printToConsole),  players.map(x => x?.input))
         this.waitingForPlayer = true
-        this.arrOfPlayers = players
-        for(const p of players){
-            p.init(this)
-        }
+        
         // this.player = "P1"
         // this.runGame()
     }
@@ -119,9 +119,9 @@ class HanabiControllerMultiplayer extends HanabiController{
 
     async runGame(){
         while(!this.checkGameOver()){
-            const curPlayerStr = this.getActivePlayer()
-            const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
-            if(this.printToConsole){console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)}
+            const curPlayerID = this.getActivePlayer()
+            const curPlayer = this.arrOfPlayers[curPlayerID]
+            if(this.printToConsole){console.log(`-----------------------------------\n\n ${curPlayer.name}'s Turn \n\n-----------------------------------`)}
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
             // console.log(action)
             // console.log(this)

@@ -6,19 +6,20 @@ import { numberSuffixes } from "./hanabiConsts"
  * @abstract
  */
 class HanabiMove{
-    constructor(typeOfMove, sourcePlayer){
+    constructor(typeOfMove, sourcePlayerID, name = undefined){
         this.typeOfMove = typeOfMove
-        this.sourcePlayer = sourcePlayer
+        this.sourcePlayerID = sourcePlayerID
+        this.name = name
     }
 
     toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s`
+        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s`
     }
 }
 
 class HanabiMovePlay extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card, drawnCard, successfulPlay){
-        super("play", sourcePlayer)
+    constructor(sourcePlayerID, targetCardIndex, card, drawnCard, successfulPlay, name = undefined){
+        super("play", sourcePlayerID, name)
         this.targetCardIndex = targetCardIndex
         this.card = card
         this.successfulPlay = successfulPlay
@@ -26,45 +27,45 @@ class HanabiMovePlay extends HanabiMove{
     }
 
     toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numberSuffixes[this.targetCardIndex]} card, a ${this.card.toString()}. ${this.successfulPlay ? "Success!" : "Failed and discarded."}`
+        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s their ${this.targetCardIndex}${numberSuffixes[this.targetCardIndex]} card, a ${this.card.toString()}. ${this.successfulPlay ? "Success!" : "Failed and discarded."}`
     }
 }
 
 class HanabiMoveDiscard extends HanabiMove{
-    constructor(sourcePlayer, targetCardIndex, card, drawnCard){
-        super("discard", sourcePlayer)
+    constructor(sourcePlayerID, targetCardIndex, card, drawnCard, name = undefined){
+        super("discard", sourcePlayerID, name)
         this.targetCardIndex = targetCardIndex
         this.card = card
         this.drawnCard = drawnCard
     }
 
     toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s their ${this.targetCardIndex}${numberSuffixes[this.targetCardIndex]} card, a ${this.card.toString()}.`
+        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s their ${this.targetCardIndex}${numberSuffixes[this.targetCardIndex]} card, a ${this.card.toString()}.`
     }
 }
 
 class HanabiMoveHint extends HanabiMove{
-    constructor(sourcePlayer, targetPlayer, hintType, hintValue, targetCardIndices){
-        super("hint", sourcePlayer)
-        this.targetPlayer = targetPlayer
+    constructor(sourcePlayerID, targetPlayerID, hintType, hintValue, targetCardIndices, name = undefined){
+        super("hint", sourcePlayerID, name)
+        this.targetPlayerID = targetPlayerID
         this.hintType = hintType
         this.hintValue = hintValue
         this.targetCardIndices = targetCardIndices
     }
 
     toString(){
-        return `${this.sourcePlayer} ${this.typeOfMove}s - "${this.targetPlayer}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue}${this.targetCardIndices.length > 1 ? "s" : ""}`
+        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s - "${this.targetPlayerID}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue}${this.targetCardIndices.length > 1 ? "s" : ""}`
     }
 }
 
 class HanabiHistoryMessage extends HanabiMove{
-    constructor(sourcePlayer, text, displayOrigin = true){
-        super("message", sourcePlayer)
+    constructor(sourcePlayerID, text, displayOrigin = true, name = undefined){
+        super("message", sourcePlayerID, name)
         this.text = text
     }
 
     toString(){
-        return `${this.displayOrigin ? this.source : ""} ${this.text}`
+        return `${this.displayOrigin ? (this.name || this.source) : ""} ${this.text}`
     }
 }
 

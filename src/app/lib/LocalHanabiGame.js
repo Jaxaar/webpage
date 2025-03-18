@@ -4,11 +4,11 @@ import { Card, makeCard, castcardsToCards} from "./HanabiCard"
 
 class LocalHanabiGame{
 
-    constructor(numPlayers = 4, printToConsole = false){
+    constructor(numPlayers = 2, names =[], printToConsole = false){
         this.numPlayers = numPlayers
         this.gameInitialized = false
         this.gameEnded = false
-        this.players = {}
+        this.players = []
         this.deck = []
         this.history = []
         this.discard = []
@@ -21,6 +21,10 @@ class LocalHanabiGame{
         this.printToConsole = printToConsole
 
         this.initGame()
+
+        for(let i = 0; i < numPlayers; i++){
+            this.players[i].name = (names?.[i] || "P"+(i+1))
+        }
     }
 
 
@@ -48,7 +52,7 @@ class LocalHanabiGame{
         const numPlayersToCardsDealt = {2:5, 3:5, 4:4, 5:4}
         this.players = this.deal(this.numPlayers, numPlayersToCardsDealt)
         // Sets first player
-        this.players["P1"].activePlayer = true
+        // this.players["P1"].activePlayer = true
 
         // Sets Game Init Flag
         this.gameInitialized = true
@@ -72,15 +76,21 @@ class LocalHanabiGame{
     }
 
     deal(numPlayers, numPlayersToCardsDealt){
-        const players = {}
-        for(let i = 1; i <= numPlayers; i++){
-            players["P" + i] = {"name": "P" + i}
-            players["P" + i].activePlayer = false
+        // const players = {}
+        const players = []
+        for(let i = 0; i < numPlayers; i++){
+            // players["P" + (i+1)] = {"name": "P" + (i+1)}
+            // players["P" + (i+1)].activePlayer = false
+            players[i] = {
+                id: i,
+                activePlayer: (i===0),
+            }
             let hand = []
             for(let j = 0; j < numPlayersToCardsDealt[numPlayers]; j++){
                 hand.push(this.deck.pop())
             }
-            players["P" + i].hand = hand
+            // players["P" + (i+1)].hand = hand
+            players[i].hand = hand
         }
         return players
     }
@@ -102,27 +112,27 @@ class LocalHanabiGame{
     }
 
     // TODO Add removing your drawnCards from the gameImage
-    getGameImage(player = null) {
-        if(player === null){
+    getGameImage(playerID = null) {
+        if(playerID === null){
             return this
         }
         const gameView = this.getGameDeepCopy()
         const blankHand = []
-        for(let i = 1; i <= gameView.players[player].hand.length; i++){
+        for(let i = 1; i <= gameView.players[playerID].hand.length; i++){
             blankHand.push(new Card("Card", i))
         }
-        gameView.players[player].hand = blankHand
+        gameView.players[playerID].hand = blankHand
         return gameView
     }
 
     // Index starts at 1 -> Cards in hand
-    playCard(player, index){
-        // if(this.printToConsole) console.log(player)
-        if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(player) == -1) || !(this.players?.[player].activePlayer) || this.players[player].hand.length < index || index < 1){
+    playCard(playerID, index){
+        // if(this.printToConsole) console.log(playerID)
+        if(!this.gameInitialized || this.gameEnded || /**(Object.keys(this.players).indexOf(playerID) == -1) ||**/ !(this.players?.[playerID].activePlayer) || this.players[playerID].hand.length < index || index < 1){
             return undefined
         }
         
-        const card = this.players[player].hand[index-1]
+        const card = this.players[playerID].hand[index-1]
 
         const successfulPlay = this.canPlayCard(card)
         if(successfulPlay){
@@ -139,26 +149,26 @@ class LocalHanabiGame{
         }
 
         const drawnCard = this.drawCard()
-        this.players[player].hand[index-1] = drawnCard
+        this.players[playerID].hand[index-1] = drawnCard
 
-        const playObj = new HanabiMovePlay(player, index, card, drawnCard, successfulPlay)
-        // const playStr = `${player}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
+        const playObj = new HanabiMovePlay(playerID, index, card, drawnCard, successfulPlay, this.players[playerID].name)
+        // const playStr = `${playerID}: Plays their ${index} card, a ${card.suit} ${card.value}. ${successfulPlay ? "Success!" : "Failed and discarded."}`
         if(this.printToConsole) console.info(playObj.toString())
         this.history.push(playObj)
 
         this.checkGameOver()
         this.advancePlayer()
-        // return this.players[player].hand[index-1]
+        // return this.players[playerID].hand[index-1]
         return playObj
     }
 
     // Index starts at 1 -> Cards in hand
-    discardCard(player, index){        
-        if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(player) == -1) || !(this.players?.[player].activePlayer) || this.players[player].hand.length < index || index < 1){
+    discardCard(playerID, index){        
+        if(!this.gameInitialized || this.gameEnded || /**(Object.keys(this.players).indexOf(playerID) == -1) ||**/ !(this.players?.[playerID].activePlayer) || this.players[playerID].hand.length < index || index < 1){
             return undefined
         }
         
-        const card = this.players[player].hand[index-1]
+        const card = this.players[playerID].hand[index-1]
 
         this.discard.push(card)
 
@@ -167,16 +177,16 @@ class LocalHanabiGame{
             this.hintsUsed = this.hintsUsed - 1
         }
         const drawnCard = this.drawCard()
-        this.players[player].hand[index-1] = drawnCard
+        this.players[playerID].hand[index-1] = drawnCard
 
-        const discObj = new HanabiMoveDiscard(player, index, card, drawnCard)
+        const discObj = new HanabiMoveDiscard(playerID, index, card, drawnCard, this.players[playerID].name)
         // const discStr = `${player}: Discards their ${index} card, a ${card.suit} ${card.value}.`
         if(this.printToConsole) console.info(discObj.toString())
         this.history.push(discObj)
 
         this.checkGameOver()
         this.advancePlayer()
-        // return this.players[player].hand[index-1]
+        // return this.players[playerID].hand[index-1]
         return discObj
     }
 
@@ -184,7 +194,7 @@ class LocalHanabiGame{
         if(this.hints < 1){
             return undefined
         }
-        if(!this.gameInitialized || this.gameEnded || (Object.keys(this.players).indexOf(sourcePlayer) == -1) || !(this.players?.[sourcePlayer].activePlayer) || !this.players?.[targetPlayer]?.hand){
+        if(!this.gameInitialized || this.gameEnded || /**(Object.keys(this.players).indexOf(sourcePlayer) == -1) ||**/ !(this.players?.[sourcePlayer].activePlayer) || !this.players?.[targetPlayer]?.hand){
             return undefined
         }
 
@@ -199,7 +209,7 @@ class LocalHanabiGame{
             }
         }
 
-        const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes)
+        const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes, this.players[sourcePlayer].name)
         // const hintStr = `${sourcePlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
         if(this.printToConsole) console.info(hintObj.toString())
         this.history.push(hintObj)
@@ -216,27 +226,36 @@ class LocalHanabiGame{
     
     // TODO: Make Smoother / faster
     advancePlayer(){
-        let arrPlayers = []
-        let activePlayer = ""
-        for(let [playerName, player] of Object.entries(this.players)){
-            arrPlayers.push(playerName)
-            if(player.activePlayer){
-                activePlayer = playerName
-                player.activePlayer = false
+
+        for(const p of this.players){
+            if(p.activePlayer === true){
+                p.activePlayer = false
+                this.players[(p.id+1) % this.players.length].activePlayer = true
+                return ((p.id+1) % this.players.length)
             }
         }
-        arrPlayers = arrPlayers.sort((a,b) => {
-            return parseInt(a.substring(1)) - parseInt(b.substring(1))
-        })
 
-        const inx = arrPlayers.indexOf(activePlayer)
-        if(inx+1 > arrPlayers.length - 1){
-            this.players[arrPlayers[0]].activePlayer = true
-            return this.players?.[arrPlayers[0]].name
-        } else{
-            this.players[arrPlayers[inx+1]].activePlayer = true
-            return this.players?.[arrPlayers[inx+1]].name
-        }
+        // let arrPlayers = []
+        // let activePlayer = ""
+        // for(let [playerName, player] of Object.entries(this.players)){
+        //     arrPlayers.push(playerName)
+        //     if(player.activePlayer){
+        //         activePlayer = playerName
+        //         player.activePlayer = false
+        //     }
+        // }
+        // arrPlayers = arrPlayers.sort((a,b) => {
+        //     return parseInt(a.substring(1)) - parseInt(b.substring(1))
+        // })
+
+        // const inx = arrPlayers.indexOf(activePlayer)
+        // if(inx+1 > arrPlayers.length - 1){
+        //     this.players[arrPlayers[0]].activePlayer = true
+        //     return this.players?.[arrPlayers[0]].name
+        // } else{
+        //     this.players[arrPlayers[inx+1]].activePlayer = true
+        //     return this.players?.[arrPlayers[inx+1]].name
+        // }
     }
 
 
@@ -249,9 +268,9 @@ class LocalHanabiGame{
     }
 
     getActivePlayer(){
-        for(let [playerName, player] of Object.entries(this.players)){
+        for(const player of this.players){
             if(player.activePlayer){
-                return playerName
+                return player.id
             }
         }
     }
