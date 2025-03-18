@@ -54,10 +54,13 @@ class HanabiController {
 
 class HanabiControllerLocalHotseat extends HanabiController{
 
-    constructor(playerCount, spoilerWall, printToConsole = false){
+    constructor(playerCount, players, spoilerWall, printToConsole = false){
         super(new LocalHanabiGame(playerCount, printToConsole))
         this.useSpoilerWallFlag = spoilerWall
-
+        this.arrOfPlayers = players
+        for(const p of players){
+            p.init(this)
+        }
     }
 
     /**
@@ -66,6 +69,20 @@ class HanabiControllerLocalHotseat extends HanabiController{
      */
     getThisPlayer(){
         return this.getActivePlayer()
+    }
+
+    async runGame(){
+        while(!this.checkGameOver()){
+            const curPlayerStr = this.getActivePlayer()
+            const curPlayer = this.arrOfPlayers[parseInt(curPlayerStr.substring(1)) - 1]
+            if(this.printToConsole){console.log(`-----------------------------------\n\nPlayer ${curPlayerStr}'s Turn \n\n-----------------------------------`)}
+            const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
+            // console.log(action)
+            // console.log(this)
+            document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
+            // console.log(getGameImage().history.map((x) => x.toString()))
+        }
+        return this.scoreGame()
     }
 
     /**

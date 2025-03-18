@@ -126,9 +126,6 @@ export default function HanabiGameInterface(gameController, verbose=false) {
 
     return (
         <div className="m-2 ">
-            <div className="font-bold">
-                Welcome to the game page!
-            </div>
             <div>
                 Players: {gameImage.numPlayers}
             </div>

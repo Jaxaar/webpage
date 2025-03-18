@@ -19,19 +19,23 @@ export default function HanabiLobby() {
     // const [numPlayers, setNumPlayers] = useState(-1)
     const [numPlayers, setNumPlayers] = useState(2)
     const [playerSelector, setPlayerSelector] = useState([])
-    const [playerNames, setplayerNames] = useState([])
+    const [playerNames, setplayerNames] = useState(["","","","",""])
 
 
     useEffect(() => {
         setPlayerSelector(Array.from({length: maxPlayers}, (_, index) => "Human"))
         setplayerNames(Array.from({length: maxPlayers}, (_, index) => `P${index+1}`))
     }, [])
+    useEffect(() => {
 
-    const [update, setUpdate] = useState(true)
-    function forceUpdate(){
-         setUpdate(!update)
-    }
-    console.log("Update")
+
+    }, [playerSelector])
+
+    // const [update, setUpdate] = useState(true)
+    // function forceUpdate(){
+    //      setUpdate(!update)
+    // }
+    // console.log("Update")
 
     function onStartButtonPress(){
         if(buildLocalGame()){
@@ -55,6 +59,12 @@ export default function HanabiLobby() {
         sessionStorage.setItem("LoadingHanabiGameMetaData", JSON.stringify(hanabiMetaData))
         console.log("game built")
         return true
+    }
+
+    function updateListState(updateFunction, originalArray,  index, newValue){
+        const newArr = [...originalArray]
+        newArr[index] = newValue
+        updateFunction(newArr)
     }
 
     return (
@@ -87,9 +97,8 @@ export default function HanabiLobby() {
                                 <select 
                                     value={playerSelector[index]} 
                                     onChange={(event) => {
-                                        playerSelector[index] = event.target.value
-                                        console.log(playerSelector)
-                                        forceUpdate()
+                                        updateListState(setPlayerSelector, playerSelector, index, event.target.value)
+                                        // console.log(playeSelector)
                                         }} 
                                     >
                                     <option value="Human">Human</option>
@@ -98,10 +107,11 @@ export default function HanabiLobby() {
                                 </select>
                             </span>
                             <span>
-                                {/*
-                                <input type="text" value={playerNames[index]} placeholder="name" className="border-2 p-1" onChange={(event) => {
-                                    playerNames[index] = event.target.value
-                                    console.log(playerNames)
+                                
+                                {/* <input type="text" value={playerNames[index]} placeholder="name" className="border-2 p-1" onChange={(event) => {
+                                    // playerNames[index] = event.target.value
+                                    updateListState(setplayerNames, playerNames, index, event.target.value)
+                                    // console.log(playerNames)
                                     // forceUpdate()
                                 }}></input> */}
                             </span>
