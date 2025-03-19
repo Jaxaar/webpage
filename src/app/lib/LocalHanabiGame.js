@@ -209,11 +209,10 @@ class LocalHanabiGame{
             }
         }
 
-        const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes, this.players[sourcePlayer].name)
+        const hintObj = new HanabiMoveHint(sourcePlayer, targetPlayer, type, targetVal, indexes, this.players[sourcePlayer].name, this.players[targetPlayer].name)
         // const hintStr = `${sourcePlayer}: Hints "${targetPlayer} - The cards ${indexes} are ${targetVal}${type=="value" ? "'s": ""}".`
         if(this.printToConsole) console.info(hintObj.toString())
         this.history.push(hintObj)
-
 
         this.hints = this.hints - 1
         this.hintsUsed = this.hintsUsed + 1

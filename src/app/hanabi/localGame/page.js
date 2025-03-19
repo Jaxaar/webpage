@@ -20,7 +20,7 @@ function ActualHanabiLobby() {
             players[i] = createNewPlayer(hanabiMetaData.playerTypes?.[i], i, hanabiMetaData.playerNames?.[i])
         }
         // console.log(hanabiMetaData)
-        console.log(players)
+        // console.log(players)
 
         const contr = new HanabiControllerLocalHotseat(hanabiMetaData.numPlayers, players, hanabiMetaData?.spoilerWall)
         contr.runGame()
@@ -29,7 +29,7 @@ function ActualHanabiLobby() {
       }, [])
 
     function createNewPlayer(type, id, name){
-        switch (type.toLowerCase()){
+        switch (type.toLowerCase().replaceAll(" ", "")){
             case "human":
                 return {
                     input: new HanabiDBHuman(id),

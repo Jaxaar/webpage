@@ -74,10 +74,10 @@ class HanabiControllerLocalHotseat extends HanabiController{
     async runGame(){
         while(!this.checkGameOver()){
             const curPlayerID = this.getActivePlayer()
-            console.log(this.arrOfPlayers)
-            console.log(curPlayerID)
+            // console.log(this.arrOfPlayers)
+            // console.log(curPlayerID)
             const curPlayer = this.arrOfPlayers[curPlayerID]
-            console.log(curPlayer)
+            // console.log(curPlayer)
             if(this.printToConsole){console.log(`-----------------------------------\n\n ${curPlayer.name}'s Turn \n\n-----------------------------------`)}
             const action = await curPlayer.getAction(this) // Not a huge fan, kinda means there'll be sideffects... To change later perhaps
             // console.log(action)

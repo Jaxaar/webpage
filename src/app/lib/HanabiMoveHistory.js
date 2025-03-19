@@ -45,16 +45,17 @@ class HanabiMoveDiscard extends HanabiMove{
 }
 
 class HanabiMoveHint extends HanabiMove{
-    constructor(sourcePlayerID, targetPlayerID, hintType, hintValue, targetCardIndices, name = undefined){
+    constructor(sourcePlayerID, targetPlayerID, hintType, hintValue, targetCardIndices, name = undefined, targetPlayerName = undefined){
         super("hint", sourcePlayerID, name)
         this.targetPlayerID = targetPlayerID
         this.hintType = hintType
         this.hintValue = hintValue
         this.targetCardIndices = targetCardIndices
+        this.targetPlayerName = targetPlayerName
     }
 
     toString(){
-        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s - "${this.targetPlayerID}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue}${this.targetCardIndices.length > 1 ? "s" : ""}`
+        return `${this.name || this.sourcePlayerID} ${this.typeOfMove}s - "${this.targetPlayerName || this.targetPlayerID}: The card${this.targetCardIndices.length > 1 ? "s" : ""} ${this.targetCardIndices} ${this.targetCardIndices.length > 1 ? "are" : "is a"} ${this.hintValue}${this.targetCardIndices.length > 1 ? "s" : ""}`
     }
 }
 
