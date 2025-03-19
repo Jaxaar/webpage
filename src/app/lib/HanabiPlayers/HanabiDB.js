@@ -1,12 +1,13 @@
-import { Suits, Values} from "./hanabiConsts";
-import {Card} from "./HanabiCard";
-import react from "react";
+import { Suits, Values} from "../hanabiConsts";
+import {Card} from "../HanabiGame/HanabiCard";
+import { HanabiPlayer } from "./HanabiPlayer";
 
 
-class HanabiDBInput{
-    constructor(playerID){
+
+class HanabiDBInput extends HanabiPlayer{
+    constructor(name){
+        super(name)
         this.kb = undefined
-        this.playerID = playerID
     }
 
     // Is called every time the player needs to make a move:
@@ -30,7 +31,8 @@ class HanabiDBInput{
 
     }
 
-    init(controller){
+    init(controller, id){
+        super.init(id)
         this.kb = new KnowledgeDatabase(controller.getGameImage(this.playerID), this.playerID)
         // console.log(this.kb)
     }
@@ -44,98 +46,8 @@ class HanabiDBInput{
     }
 }
 
-class HanabiDBHuman extends HanabiDBInput{
-
-    constructor(playerID){
-        super(playerID)
-    }
 
 
-    /**
-     * @override
-     * @param {*} controller 
-     * @param {*} gameImage 
-     * @returns 
-     */
-    async determinePlay(controller, gameImage){
-
-        const promisedEvent = await this.listenForHanabiInterfaceEvent()
-
-        // console.log(gameImage)
-        // let userInput = prompt("Please enter a move:", "Discard-1");
-        // console.log("You entered:", userInput);
-        return promisedEvent.detail
-    }
-
-    async listenForHanabiInterfaceEvent(){
-        const p = new Promise(resolve => {
-            document.addEventListener("HanabiActionTaken", resolve, {once: true})
-        })
-        // console.log(p)
-        return p
-    }
-}
-
-
-class HanabiDBAI extends HanabiDBInput{
-
-    constructor(playerID, waitForPermission = false){
-        super(playerID)
-        this.waitForPermission = waitForPermission
-    }
-
-    /**
-     * @override
-     * @param {*} controller 
-     * @param {*} gameImage 
-     * @returns 
-     */
-    async determinePlay(controller, gameImage){
-
-        if(this.waitForPermission){
-            const reply = await this.listenForMakePlayEvent()
-            // console.log(reply)
-        }
-
-        const safePlay = this.kb.getSafePlay(gameImage)
-        if(safePlay !== undefined){
-            // console.log("safe Play")
-            return controller.playCard(this.playerID, safePlay)
-        }
-
-        // Might want this after Hint
-        const safeDiscard = this.kb.getSafeDiscard(gameImage)
-        if(safeDiscard !== undefined){
-            // console.log("safe Discard")
-            return controller.discardCard(this.playerID, safeDiscard)
-        }
-
-        const bestHint = this.kb.getBestHint(gameImage)
-        if(bestHint !== undefined){
-            // console.log("Hint")
-            return controller.handleHint(this.playerID, bestHint.type, bestHint.val, bestHint.targetPlayerID)
-        }
-
-        const defaultDiscard = this.kb.getdefaultDiscard(gameImage)
-        if(defaultDiscard !== undefined){
-            // console.log("Default Discard")
-            return controller.discardCard(this.playerID, defaultDiscard)   
-        }
-
-
-        console.log("uh oh")
-        return undefined
-        
-    }
-
-    async listenForMakePlayEvent(){
-        const p = new Promise(resolve => {
-            document.addEventListener("HanabiAIGoAhead", resolve, {once: true})
-        })
-        // console.log(p)
-        return p
-    }
-}
 
 class KnowledgeDatabase{
     constructor(gameImage, playerID){
@@ -400,165 +312,4 @@ class Knowledge{
     }
 }
 
-export {HanabiDBAI, HanabiDBHuman}
-
-
-
-
-
-
-
-
-
-/**
- * 
- * 
- * 
-    public String getSafePlay(Board boardState, Hand partnerHand){
-        for(int i  = 0; i < handSize; i++){
-            if(myKnowledge.get(i).isSafePlay(boardState)){
-                resetKnowledge(i, PLAYER.Me, partnerHand);
-                return "PLAY " + i + " " + i;
-            }
-        }
-        return "NONE";
-    }
-
-    public String getSafeDiscard(Board boardState, Hand partnerHand){
-        if(boardState.numHints == boardState.MAX_HINTS){
-            return "NONE";
-        }
-        for(int i  = 0; i < handSize; i++){
-            if(myKnowledge.get(i).isSafeDiscard(boardState)){
-                resetKnowledge(i, PLAYER.Me, partnerHand);
-                return "DISCARD " + i + " " + i;
-            }
-        }
-        return "NONE";
-    }
- * 
-    public String getBestHint(Board boardState, Hand partnerHand){
-        // TODO Check for danger cards ... make it work
-//        if(boardState.numHints > 0){
-//            String hint = getDangerCardHint(boardState, partnerHand);
-//            if(!hint.equals("NONE")){
-//                return hint;
-//            }
-//        }
-
-        if(boardState.numHints < 1){
-            return "NONE";
-        }
-
-        // Gets hint if it is
-        try {
-            for(int i = 0; i < partnerKnowledge.size(); i++){
-
-                if(boardState.isLegalPlay(partnerHand.get(i))) {
-
-                    String hint = partnerKnowledge.get(i).getHintType();
-
-                    if(hint.equals("NUMBERHINT ")) {
-                        hint += partnerHand.get(i).value;
-                        tellPartnerNumber(partnerHand, partnerHand.get(i).value);
-                        return hint;
-
-                    } else if (hint.equals("COLORHINT ")) {
-                        hint += partnerHand.get(i).color;
-                        tellPartnerColor(partnerHand, partnerHand.get(i).color);
-                        return hint;
-
-                    } else if (hint.equals("NONE")) {
-//                        System.out.println("Slot Already completely hinted");
-                    } else {
-                        System.out.println("HintReturning Failure - KB85");
-                    }
-                }
-            }
-        }catch (Exception e){
-            System.out.println(e.toString());
-        }
-
-        return "NONE";
-    }
-
-
-
-
-
-
-
-
-    public boolean isSafePlay(Board boardState){
-        if(possibleCards.size() == 0){
-//            System.out.println("Error??? No possibilites");
-            System.out.println("Minor Error, Knowledge entry concluded their hand was impossible, Discarding anomaly"); //TODO Fix anomaly (maybe just reload possibilities every time you cull??
-            return false;
-        }
-        for(int i = 0; i < possibleCards.size(); i++){
-            if(!boardState.isLegalPlay(possibleCards.get(i))){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isSafeDiscard(Board boardState){
-        if(possibleCards.size() == 0){
-//            System.out.println("Error?? No possibilites? Discard ig");
-//            System.out.println(boardState);
-//            System.out.println(Colors.suitColor(color));
-//            System.out.println(value);
-            return true;
-        }
-        for(int i = 0; i < possibleCards.size(); i++){
-            Card c = possibleCards.get(i);
-            if(c.value >= boardState.tableau.get(c.color)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public String getHintType(){
-//        System.out.println("Num " + value + "; Col " + color);
-        if(value == -1){
-            return "NUMBERHINT ";
-        }
-        if(color == -1){
-            return "COLORHINT ";
-        }
-        else{
-            return "NONE";
-        }
-    }
-
-    private void cullPossibilities(){
-//        System.out.println("********************CULLINIG ************");
-//        System.out.println(possibleCards);
-//        System.out.println(value);
-//        System.out.println(Colors.suitColor(color));
-        for(int i  = 0; i < possibleCards.size(); i++){
-            boolean remove = false;
-            if(value != -1){
-                if(possibleCards.get(i).value != value){
-                    remove = true;
-                }
-            }
-            if(color != -1){
-                if(possibleCards.get(i).color != color){
-                    remove = true;
-                }
-            }
-            if(remove){
-                possibleCards.remove(i);
-                i--;
-            }
-        }
-//        System.out.println(possibleCards);
-
-    }
-
-
-
- */
+export {KnowledgeDatabase, HanabiDBInput}

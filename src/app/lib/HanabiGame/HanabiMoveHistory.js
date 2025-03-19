@@ -1,5 +1,5 @@
 import { Card } from "./HanabiCard"
-import { numberSuffixes } from "./hanabiConsts"
+import { numberSuffixes } from "../hanabiConsts"
 
 
 /**

@@ -1,4 +1,4 @@
-import { LocalHanabiGame } from "./LocalHanabiGame"
+import { LocalHanabiGame } from "./HanabiGame/LocalHanabiGame"
 
 
 
@@ -59,7 +59,10 @@ class HanabiController {
 class HanabiControllerLocalHotseat extends HanabiController{
 
     constructor(playerCount, players, spoilerWall, printToConsole = false){
-        super(new LocalHanabiGame(playerCount, players.map(x => x?.name), printToConsole), players.map(x => x?.input))
+        console.log("here")
+        const game = new LocalHanabiGame(playerCount, players, printToConsole)
+        console.log("here2")
+        super(game, players)
         this.useSpoilerWallFlag = spoilerWall
     }
 
@@ -100,7 +103,7 @@ class HanabiControllerLocalHotseat extends HanabiController{
 class HanabiControllerMultiplayer extends HanabiController{
 
     constructor(playerCount, players, printToConsole = false){
-        super(new LocalHanabiGame(playerCount, players.map(x => x?.name), printToConsole),  players.map(x => x?.input))
+        super(new LocalHanabiGame(playerCount, players, printToConsole),  players)
         this.waitingForPlayer = true
         
         // this.player = "P1"

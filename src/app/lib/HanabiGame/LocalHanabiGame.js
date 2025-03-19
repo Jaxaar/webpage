@@ -1,10 +1,11 @@
-import { Suits, Values} from "./hanabiConsts";
+import { Suits, Values} from "../hanabiConsts";
 import { HanabiHistoryMessage, HanabiMove, HanabiMoveDiscard, HanabiMoveHint, HanabiMovePlay, convertObjectToHanabiMove } from "./HanabiMoveHistory";
 import { Card, makeCard, castcardsToCards} from "./HanabiCard"
 
 class LocalHanabiGame{
 
-    constructor(numPlayers = 2, names =[], printToConsole = false){
+    constructor(numPlayers = 2, playerInputs, printToConsole = false){
+        console.error("New Game???")
         this.numPlayers = numPlayers
         this.gameInitialized = false
         this.gameEnded = false
@@ -21,9 +22,10 @@ class LocalHanabiGame{
         this.printToConsole = printToConsole
 
         this.initGame()
-
+        console.log(playerInputs)
         for(let i = 0; i < numPlayers; i++){
-            this.players[i].name = (names?.[i] || "P"+(i+1))
+            this.players[i].name = (playerInputs?.[i]?.name || "P"+(i+1))
+            playerInputs?.[i].assignID(i)
         }
     }
 

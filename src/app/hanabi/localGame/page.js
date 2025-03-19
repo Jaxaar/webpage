@@ -4,7 +4,8 @@ import "../../ui/css/random.css"
 import { Suspense } from 'react'
 import HanabiGameInterface from "./hanabiGameInterface";
 import { HanabiControllerLocalHotseat } from "@/app/lib/hanabiController";
-import { HanabiDBAI, HanabiDBHuman } from "@/app/lib/hanabiAI";
+import { HanabiDBAIv1 } from "@/app/lib/HanabiPlayers/hanabiAI";
+import { HanabiDBHuman } from "@/app/lib/HanabiPlayers/HanabiHumans";
 
 
 function ActualHanabiLobby() {
@@ -16,8 +17,8 @@ function ActualHanabiLobby() {
         const hanabiMetaData = JSON.parse(sessionStorage.getItem("LoadingHanabiGameMetaData"))
         
         const players = []
-        for(let i = 0; i < hanabiMetaData.numPlayers; i++){
-            players[i] = createNewPlayer(hanabiMetaData.playerTypes?.[i], i, hanabiMetaData.playerNames?.[i])
+        for(let i = 0; i < hanabiMetaData.playerData.length; i++){
+            players[i] = createNewPlayer(hanabiMetaData.playerData[i])
         }
         // console.log(hanabiMetaData)
         // console.log(players)
@@ -28,19 +29,14 @@ function ActualHanabiLobby() {
         setControllerLoaded(true)
       }, [])
 
-    function createNewPlayer(type, id, name){
-        switch (type.toLowerCase().replaceAll(" ", "")){
+    function createNewPlayer(data){
+        switch (data.input.toLowerCase().replaceAll(" ", "")){
             case "human":
-                return {
-                    input: new HanabiDBHuman(id),
-                    name: name,
-                }
+                return new HanabiDBHuman(data.name)
                 // break
             case "aiv1":
-                return {
-                    input: new HanabiDBAI(id),
-                    name: name,
-                }                // break
+                return new HanabiDBAIv1(data.name)
+                // break
         }
 
 

@@ -1,11 +1,11 @@
 'use client'
 import Link from "next/link";
-import { HanabiAPI, runSingleGame } from "../../lib/hanabiAPI";
-import { HanabiDBAI, HanabiDBHuman } from "@/app/lib/hanabiAI";
+import { HanabiDBAIv1 } from "@/app/lib/HanabiPlayers/hanabiAI";
+import { HanabiDBHuman } from "@/app/lib/HanabiPlayers/HanabiHumans";
 import { useState } from "react";
 import "../../ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
-import { LocalHanabiGame } from "@/app/lib/LocalHanabiGame";
+import { LocalHanabiGame } from "@/app/lib/HanabiGame/LocalHanabiGame";
 import HanabiGameInterface from "../localGame/hanabiGameInterface";
 import { HanabiControllerLocalHotseat, HanabiControllerMultiplayer } from "@/app/lib/hanabiController";
 
@@ -71,8 +71,8 @@ export default function HanabiAIPage() {
             return
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
-        // const controller = new HanabiControllerMultiplayer(2, [new HanabiDBAI("P1", true), new HanabiDBAI("P2", true)])
-        const controller = new HanabiControllerMultiplayer(2, [{input: new HanabiDBHuman(0)}, {input:new HanabiDBAI(1, AIShouldWait)}])
+        // const controller = new HanabiControllerMultiplayer(2, [new HanabiDBAIv1("P1", true), new HanabiDBAIv1("P2", true)])
+        const controller = new HanabiControllerMultiplayer(2, [{input: new HanabiDBHuman(0)}, {input:new HanabiDBAIv1(1, AIShouldWait)}])
         // const controller = new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")])
 
         controller.runGame()

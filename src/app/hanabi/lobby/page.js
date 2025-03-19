@@ -50,10 +50,13 @@ export default function HanabiLobby() {
             return false
         }
 
+        const playerData = playerNames.map((k, i) => {
+            return {name: k, input: playerSelector[i]}
+        })
+
         const hanabiMetaData = {
             numPlayers: numPlayers,
-            playerTypes: playerSelector,
-            playerNames: playerNames,
+            playerData: playerData,
             spoilerWall: false,
         }
         sessionStorage.setItem("LoadingHanabiGameMetaData", JSON.stringify(hanabiMetaData))
