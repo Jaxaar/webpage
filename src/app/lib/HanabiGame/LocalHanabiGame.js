@@ -303,6 +303,9 @@ class LocalHanabiGame{
     }
 
     gameOver(){
+        if(this.gameEnded){
+            return true
+        }
         const gameOverMessage = new HanabiHistoryMessage("TheGame", "Game Over! Score: " + this.scoreGame(), false)
         if(this.printToConsole) console.info("Game Over! Score: " + this.scoreGame())
         this.history.push(gameOverMessage)
