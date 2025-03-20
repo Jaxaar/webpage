@@ -17,7 +17,7 @@ function ActualHanabiLobby() {
         const hanabiMetaData = JSON.parse(sessionStorage.getItem("LoadingHanabiGameMetaData"))
         
         const players = []
-        for(let i = 0; i < hanabiMetaData.playerData.length; i++){
+        for(let i = 0; i < hanabiMetaData.numPlayers; i++){
             players[i] = createNewPlayer(hanabiMetaData.playerData[i])
         }
         // console.log(hanabiMetaData)

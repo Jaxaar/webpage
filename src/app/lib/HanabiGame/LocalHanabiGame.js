@@ -5,7 +5,14 @@ import { Card, makeCard, castcardsToCards} from "./HanabiCard"
 class LocalHanabiGame{
 
     constructor(numPlayers = 2, playerInputs, printToConsole = false){
-        console.error("New Game???")
+
+        // There's gotta be a better way to prevent a ton of extra initializations just for type casting
+        if(playerInputs?.length != numPlayers){
+            // console.error("New Game???")
+            return
+        }
+        // console.log(playerInputs)
+
         this.numPlayers = numPlayers
         this.gameInitialized = false
         this.gameEnded = false
@@ -22,8 +29,9 @@ class LocalHanabiGame{
         this.printToConsole = printToConsole
 
         this.initGame()
-        console.log(playerInputs)
-        for(let i = 0; i < numPlayers; i++){
+
+        // Side effects on the inputs...
+        for(let i = 0; i < playerInputs.length; i++){
             this.players[i].name = (playerInputs?.[i]?.name || "P"+(i+1))
             playerInputs?.[i].assignID(i)
         }

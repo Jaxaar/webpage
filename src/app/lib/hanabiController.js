@@ -59,9 +59,9 @@ class HanabiController {
 class HanabiControllerLocalHotseat extends HanabiController{
 
     constructor(playerCount, players, spoilerWall, printToConsole = false){
-        console.log("here")
+        // console.log("here")
         const game = new LocalHanabiGame(playerCount, players, printToConsole)
-        console.log("here2")
+        // console.log("here2")
         super(game, players)
         this.useSpoilerWallFlag = spoilerWall
     }
@@ -87,8 +87,10 @@ class HanabiControllerLocalHotseat extends HanabiController{
             // console.log(this)
             document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
             // console.log(getGameImage().history.map((x) => x.toString()))
-        }
-        return this.scoreGame()
+        } 
+        const score = this.scoreGame()
+        document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
+        return score
     }
 
     /**

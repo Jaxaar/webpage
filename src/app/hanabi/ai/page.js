@@ -38,8 +38,8 @@ export default function HanabiAIPage() {
         for(let i = 0; i < numGames; i++){
             score += await runGame()
         }
-        console.log(`Avg. Score from ${numGames} games: ${score*1.0 / numGames}`)
-        setAvgScore(score*1.0 / numGames)
+        console.log(`Avg. Score from ${numGames} games: ${(score*1.0) / numGames}`)
+        setAvgScore((score*1.0) / numGames)
         return true
     }
 
@@ -47,9 +47,7 @@ export default function HanabiAIPage() {
         const players = []
         
         for(let i = 0; i < numPlayers; i++){
-            players.push({
-                input: new HanabiDBAI(i, false)
-            })
+            players.push(new HanabiDBAIv1(i, false))
         }
         
         const controller = new HanabiControllerMultiplayer(numPlayers, players)
@@ -72,7 +70,7 @@ export default function HanabiAIPage() {
         }
         console.log(`Starting ${numGames} game2(s) with ${numPlayers}`)
         // const controller = new HanabiControllerMultiplayer(2, [new HanabiDBAIv1("P1", true), new HanabiDBAIv1("P2", true)])
-        const controller = new HanabiControllerMultiplayer(2, [{input: new HanabiDBHuman(0)}, {input:new HanabiDBAIv1(1, AIShouldWait)}])
+        const controller = new HanabiControllerMultiplayer(2, [new HanabiDBHuman("Human"), new HanabiDBAIv1("AI", AIShouldWait)])
         // const controller = new HanabiControllerMultiplayer(3, [new HanabiDBHuman("P1"), new HanabiDBHuman("P2"), new HanabiDBHuman("P3")])
 
         controller.runGame()
