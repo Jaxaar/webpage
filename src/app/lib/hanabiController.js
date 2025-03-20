@@ -89,7 +89,6 @@ class HanabiControllerLocalHotseat extends HanabiController{
             // console.log(getGameImage().history.map((x) => x.toString()))
         } 
         const score = this.scoreGame()
-        document.dispatchEvent(new CustomEvent("HanabiGamestateChanged"))
         return score
     }
 

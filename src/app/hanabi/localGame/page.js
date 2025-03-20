@@ -24,7 +24,7 @@ function ActualHanabiLobby() {
         // console.log(players)
 
         const contr = new HanabiControllerLocalHotseat(hanabiMetaData.numPlayers, players, hanabiMetaData?.spoilerWall)
-        contr.runGame()
+        // contr.runGame()
         setcontroller(contr)
         setControllerLoaded(true)
       }, [])

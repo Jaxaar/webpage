@@ -37,6 +37,7 @@ export default function HanabiGameInterface(gameController, verbose=false) {
             // console.log("Update gameImage")
             setGameImage(controller.getGameImage())
         })
+        controller.runGame()
     }, [])
     
     function clearSelectedCard(){
