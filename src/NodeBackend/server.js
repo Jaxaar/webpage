@@ -1,5 +1,5 @@
 // Create a simple Express server
-const express = require('express');
+import express from 'express';
 const server = express();
 
 const baseRoute = "/api/v1"
@@ -8,9 +8,13 @@ server.get(baseRoute, (req, res) => {
   res.json({ message: 'Hello from the backend!' });
 });
 
-const usersRoute = require('./routes/example');
+import userRouter    from './routes/example.js';
+import testRouter from './routes/test.js';
 
-server.use(baseRoute, usersRoute)
+
+server.use(baseRoute, userRouter)
+server.use(baseRoute, testRouter)
+
 
 // Example specifying the port and starting the server
 const port = process.env.PORT || 3001; // You can use environment variables for port configuration

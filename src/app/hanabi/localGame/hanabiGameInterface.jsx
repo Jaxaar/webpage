@@ -1,7 +1,7 @@
 'use client'
 import Card from "../../ui/hanabiComponents/Card";
 import { useState, useEffect, useRef } from "react";
-import "../../ui/css/random.css"
+import "../../../app/ui/css/random.css"
 
 export default function HanabiGameInterface(gameController, verbose=false) {
 

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react"
-import "../../ui/css/random.css"
+import "../css/random.css"
 import { colorDict } from "@/app/lib/hanabiConsts"
 import Image from 'next/image';
 

@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 import { useState } from "react";
-import "../../ui/css/random.css"
+import "../../../app/ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
 import { useEffect } from "react";
 

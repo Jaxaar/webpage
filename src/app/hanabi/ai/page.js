@@ -3,7 +3,7 @@ import Link from "next/link";
 import { HanabiDBAIv1 } from "@/app/lib/HanabiPlayers/hanabiAI";
 import { HanabiDBHuman } from "@/app/lib/HanabiPlayers/HanabiHumans";
 import { useState } from "react";
-import "../../ui/css/random.css"
+import "../../../app/ui/css/random.css"
 import { RedirectType, redirect } from "next/navigation";
 import { LocalHanabiGame } from "@/app/lib/HanabiGame/LocalHanabiGame";
 import HanabiGameInterface from "../localGame/hanabiGameInterface";

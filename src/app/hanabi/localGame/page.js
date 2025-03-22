@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from "react";
-import "../../ui/css/random.css"
+import "../../../app/ui/css/random.css"
 import { Suspense } from 'react'
 import HanabiGameInterface from "./hanabiGameInterface";
 import { HanabiControllerLocalHotseat } from "@/app/lib/hanabiController";
