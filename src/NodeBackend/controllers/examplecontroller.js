@@ -1,11 +1,11 @@
-import asyncHandler from "express-async-handler";
+// import asyncHandler from "express-async-handler";
 
 
 
 
-const exampleHandler = asyncHandler(async (req, res, next) => {
-  res.send("NOT IMPLEMENTED: Example Page");
-});
-console.log(exampleHandler)
+// const exampleHandler = asyncHandler(async (req, res, next) => {
+//   res.send("NOT IMPLEMENTED: Example Page");
+// });
+// console.log(exampleHandler)
 
-export default {exampleHandler}
+// export default {exampleHandler}
