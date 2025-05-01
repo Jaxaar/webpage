@@ -1,10 +1,41 @@
 'use client'
 import Image from "next/image";
+import { GET, logMsgL, POST, POSTjson } from "./lib/requests";
 
 export default function Home() {
-    async function testFetch(){
-        const result = await fetch(`/webpage/api/test`)
-        console.log(result)
+
+    const apiURLExtension = `/api/v1`
+    const apiURLBase = `${window.location.protocol}//${window.location.hostname}:3001${apiURLExtension}`
+
+    async function testLogin(){
+        const response = await POSTjson(`${apiURLBase}/login`, {
+            body_json: {
+                username: "test",
+                password: "test2"
+            },
+            onErr: logMsgL("Error /w login post"),
+            // useJWT: true,
+        });
+        console.log(response)
+    }
+
+    async function testGet(){
+        const response = await GET(`${apiURLBase}/xyz`, {
+            onErr: logMsgL("Error /w post"),
+            // useJWT: true,
+        });
+        console.log(response)
+    }
+
+    async function testPost(){
+        const response = await POSTjson(`${apiURLBase}/`, {
+            body_json: {
+                text: ""
+            },
+            onErr: logMsgL("Error /w post"),
+            useJWT: true,
+        });
+        console.log(response)
     }
 
     return (
@@ -16,8 +47,14 @@ export default function Home() {
                 WIP... I Hope... Maybe got shelved... Idk
             </div>
             <div>
-                <div onClick={testFetch}>
-                        Test
+                <div onClick={testLogin}>
+                        Test Login
+                </div>
+                <div onClick={testGet}>
+                        Test Get
+                </div>
+                <div onClick={testPost}>
+                        Test Post
                 </div>
             </div>
             <div>
