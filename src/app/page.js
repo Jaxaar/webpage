@@ -10,8 +10,8 @@ export default function Home() {
     async function testLogin(){
         const response = await POSTjson(`${apiURLBase}/login`, {
             body_json: {
-                username: "test",
-                password: "test2"
+                username: "testUser",
+                password: "test"
             },
             onErr: logMsgL("Error /w login post"),
             // useJWT: true,

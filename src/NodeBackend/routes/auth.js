@@ -21,22 +21,36 @@ router.get('/register', (req, res) => {
 // Login
 router.post('/login', (req, res) => {
 
-    if(req?.email === undefined || req?.password === undefined){
-        res.status(400).send("Invalid Username or password");
+    console.log(req.body)
+
+    const username = req?.body?.username
+    const password = req?.body?.password
+
+    if(username === undefined || password === undefined){
+        res.status(400).send("Username and password required");
     }
 
-    console.log(req.body)
-    console.log("hi")
-    const email = req.email
-    const pass = req.password
+    // Check if user exists in db
+    if(!true){
+        res.status(404).send("User doesn't exist");
+    }
 
-    // return jsonify({
-    //     'message': 'Login successful',
-    //     'user': user.to_json(),
-    //     "access_token": access_token
-    // }), 200
+    // Check if password is not right for the user
+    if(password !== "test"){
+        res.status(401).send("Incorrect Username or password");
+        console.log("hi")
+    }
 
-    res.status(200).send({t: 'login'});
+    const accessToken = ""
+
+    
+    const reply = {
+        'message': 'Login successful',
+        'user': username,
+        "access_token": accessToken
+    }
+
+    res.status(200).send(reply);
 
 });
 
